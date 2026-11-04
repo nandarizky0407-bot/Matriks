@@ -1,0 +1,1367 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Presentasi Interaktif: MATRIKS — Matematika Kelas XI (Kurikulum Merdeka)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#FAF8F4; --surface:#FFFFFF; --ink:#1E3A5F; --ink2:#52627A;
+  --line:#E7E1D6; --soft:#F3EFE7; --navy:#1E3A5F;
+  --ok:#2E9E5B; --okbg:#EAF7EF; --bad:#C94F4F; --badbg:#FBEEEE;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{background:var(--bg);color:var(--ink);font-family:'Inter','Segoe UI',system-ui,-apple-system,Roboto,sans-serif;font-size:16.5px;line-height:1.65;-webkit-font-smoothing:antialiased}
+h1,h2,h3,h4{font-family:'Poppins','Inter','Segoe UI',sans-serif;margin:0 0 .5em;line-height:1.25}
+p{margin:.4em 0}
+b,strong{font-weight:700}
+button{font-family:inherit}
+#app{min-height:100dvh;display:flex;flex-direction:column}
+
+/* ---------- top bar ---------- */
+.topbar{display:flex;align-items:center;gap:14px;padding:12px 18px;border-bottom:1px solid var(--line);background:var(--surface);position:sticky;top:0;z-index:30}
+.iconbtn{border:1.5px solid var(--line);background:#fff;border-radius:10px;width:40px;height:40px;font-size:19px;cursor:pointer;color:var(--ink);flex:none}
+.iconbtn:hover{border-color:var(--navy);background:var(--soft)}
+.pwrap{flex:1;height:9px;background:#ECE6DA;border-radius:99px;overflow:hidden}
+#pfill{height:100%;width:0%;background:var(--navy);border-radius:99px;transition:width .25s ease}
+.counter{font-weight:700;font-size:14.5px;color:var(--ink2);font-variant-numeric:tabular-nums;flex:none}
+
+/* ---------- stage ---------- */
+#stage{flex:1;width:100%;max-width:1100px;margin:0 auto;padding:30px 26px 130px;overflow:visible}
+.slide{max-width:1060px;margin:0 auto}
+.kicker{display:inline-block;font-size:12.5px;font-weight:800;letter-spacing:.18em;text-transform:uppercase;color:var(--ac,var(--navy));background:color-mix(in srgb,var(--ac,var(--navy)) 10%,#fff);border:1px solid color-mix(in srgb,var(--ac,var(--navy)) 25%,#fff);padding:5px 12px;border-radius:99px;margin-bottom:14px}
+h2.stitle{font-size:clamp(26px,3.4vw,38px);font-weight:800;color:var(--ink)}
+h2.stitle::after{content:"";display:block;width:74px;height:5px;border-radius:99px;background:var(--ac,var(--navy));margin-top:10px}
+.lead{font-size:17.5px;color:var(--ink2);max-width:820px}
+.muted{color:var(--ink2);font-size:14.5px}
+.small{font-size:14px}
+
+/* ---------- cards & boxes ---------- */
+.card{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:20px 22px;margin:14px 0;box-shadow:0 1px 3px rgba(30,58,95,.05)}
+.card h3{font-size:18px;color:var(--ac,var(--navy));display:flex;align-items:center;gap:8px}
+.card h3::before{content:"";width:9px;height:9px;border-radius:3px;background:var(--ac,var(--navy));flex:none}
+.concept{border-left:6px solid var(--ac,var(--navy))}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+@media(max-width:760px){.grid2,.grid3{grid-template-columns:1fr}}
+.note{border-radius:12px;padding:13px 16px;margin:13px 0;font-size:15px;border:1px solid}
+.note b{display:block;margin-bottom:3px;font-family:'Poppins',sans-serif;font-size:14.5px}
+.note.awas{background:#FDF3E7;border-color:#F0DCBB;color:#7A5217}
+.note.tahu{background:#EAF4FB;border-color:#CBE2F4;color:#1E4E79}
+.note.sukses{background:var(--okbg);border-color:#CBE8D6;color:#1F6B3D}
+.k{display:inline-block;background:var(--soft);border:1px solid var(--line);border-radius:8px;padding:1px 9px;font-weight:700;font-size:.92em}
+.chips{display:flex;flex-wrap:wrap;gap:9px;margin:12px 0}
+.chip{background:#fff;border:1.5px solid color-mix(in srgb,var(--ac,var(--navy)) 35%,#fff);color:var(--ink);border-radius:99px;padding:6px 14px;font-size:14px;font-weight:600}
+ol.steps{margin:.3em 0 .2em;padding-left:1.35em}
+ol.steps li{margin:.45em 0}
+ul.tight{margin:.3em 0;padding-left:1.3em}
+ul.tight li{margin:.4em 0}
+
+/* ---------- matrix rendering ---------- */
+.mtx{display:inline-flex;align-items:stretch;margin:4px 3px;vertical-align:middle;color:var(--ink)}
+.mtx-l,.mtx-r{width:8px;flex:none;position:relative}
+.mtx-l{border:2.2px solid #3A5578;border-right:none;border-radius:4px 0 0 4px}
+.mtx-r{border:2.2px solid #3A5578;border-left:none;border-radius:0 4px 4px 0}
+.mtx-g{display:grid;gap:3px 18px;padding:5px 7px;align-items:center;justify-items:center;font-variant-numeric:tabular-nums;font-weight:600}
+.mc{min-width:20px;text-align:center;padding:1px 4px;border-radius:5px;white-space:nowrap}
+.mtx.big .mc{font-size:1.3rem;padding:3px 7px;min-width:30px}
+.mtx.big .mtx-g{gap:6px 26px}
+.mtx .mc.hl{background:color-mix(in srgb,var(--ac,#2D7DD2) 16%,#fff);box-shadow:inset 0 0 0 1.8px var(--ac,#2D7DD2)}
+.mtx .mc.dim{color:#B9B2A4}
+.mtx .mc.r0{background:#EAF2FD}.mtx .mc.r1{background:#FDF0E4}.mtx .mc.r2{background:#EBF7F1}
+.mtx .mc.pick{background:#FFF3C9;box-shadow:inset 0 0 0 2px #D9A400}
+.mtx .mc.twin{background:#F3EAFD;box-shadow:inset 0 0 0 1.8px #7C5CBF}
+.frac{display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;font-size:.82em;line-height:1.15;margin:0 2px}
+.frac>span:first-child{border-bottom:1.6px solid currentColor;padding:0 4px}
+sub,sup{line-height:0}
+
+/* ---------- interactive widgets ---------- */
+.widget{margin:18px 0}
+.wbox{background:var(--surface);border:2px solid color-mix(in srgb,var(--ac,var(--navy)) 30%,#fff);border-radius:18px;padding:20px 22px}
+.wbox h4{color:var(--ac,var(--navy));font-size:16.5px;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.wrow{display:flex;flex-wrap:wrap;gap:22px;align-items:flex-start}
+.winfo{flex:1;min-width:250px;background:var(--soft);border-radius:12px;padding:14px 16px;font-size:15px;min-height:96px}
+.winfo b{color:var(--ac,var(--navy))}
+.wcell{cursor:pointer;border:none;background:transparent;font:inherit;font-weight:600;border-radius:6px;transition:background .15s}
+.wcell:hover{background:color-mix(in srgb,var(--ac,#2D7DD2) 14%,#fff)}
+.mtx .mc.bcell{cursor:pointer}
+.btn{background:var(--ac,var(--navy));color:#fff;border:none;border-radius:11px;padding:10px 18px;font-weight:700;font-size:15px;cursor:pointer;transition:transform .1s,filter .15s}
+.btn:hover{filter:brightness(1.1)}
+.btn:active{transform:scale(.97)}
+.btn.ghost{background:#fff;color:var(--ac,var(--navy));border:1.8px solid var(--ac,var(--navy))}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.stepper{display:inline-flex;align-items:center;gap:6px}
+.stepper button{width:26px;height:26px;border-radius:8px;border:1.5px solid var(--line);background:#fff;font-weight:800;cursor:pointer;color:var(--ink);line-height:1}
+.stepper button:hover{border-color:var(--ac,var(--navy));color:var(--ac,var(--navy))}
+.pills{display:flex;flex-wrap:wrap;gap:9px;margin:10px 0}
+.pill{border:1.8px solid var(--line);background:#fff;border-radius:99px;padding:7px 15px;font-weight:600;font-size:14px;cursor:pointer;color:var(--ink)}
+.pill:hover{border-color:var(--ac,var(--navy))}
+.pill.on{background:var(--ac,var(--navy));border-color:var(--ac,var(--navy));color:#fff}
+.slider{-webkit-appearance:none;appearance:none;width:100%;max-width:340px;height:8px;border-radius:99px;background:#E4DECF;outline:none;margin:12px 0}
+.slider::-webkit-slider-thumb{-webkit-appearance:none;width:24px;height:24px;border-radius:50%;background:var(--ac,var(--navy));cursor:pointer;border:3px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.25)}
+.slider::-moz-range-thumb{width:22px;height:22px;border-radius:50%;background:var(--ac,var(--navy));cursor:pointer;border:3px solid #fff}
+.kv{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.tag{display:inline-block;background:color-mix(in srgb,var(--ac,var(--navy)) 12%,#fff);color:var(--ac,var(--navy));font-weight:700;border-radius:8px;padding:2px 10px;font-size:13.5px}
+.gallery{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:12px 0}
+@media(max-width:760px){.gallery{grid-template-columns:repeat(2,1fr)}}
+.gcard{border:2px solid var(--line);border-radius:14px;background:#fff;padding:14px 12px;text-align:center;cursor:pointer;transition:all .15s}
+.gcard:hover{transform:translateY(-2px);border-color:var(--ac,var(--navy))}
+.gcard.on{border-color:var(--ac,var(--navy));background:color-mix(in srgb,var(--ac,var(--navy)) 7%,#fff);box-shadow:0 3px 10px color-mix(in srgb,var(--ac,var(--navy)) 15%,transparent)}
+.gcard b{display:block;font-size:15px;margin-bottom:2px}
+.gcard span{font-size:12.5px;color:var(--ink2)}
+.wex{display:flex;gap:20px;align-items:center;flex-wrap:wrap;background:var(--soft);border-radius:12px;padding:14px 16px;margin-top:12px}
+
+/* ---------- contoh soal & langkah ---------- */
+.ccard{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:20px 22px;margin:16px 0;box-shadow:0 1px 3px rgba(30,58,95,.05)}
+.ccard .cq{background:var(--soft);border-radius:12px;padding:13px 16px;margin-bottom:12px}
+.ccard .cq b{color:var(--ac,var(--navy))}
+.stepitem{display:none;border-left:4px solid var(--ac,var(--navy));background:#fff;border-radius:0 10px 10px 0;padding:10px 14px;margin:9px 0;animation:pop .25s ease}
+.stepitem.show{display:block}
+@keyframes pop{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.answerbox{display:none;margin-top:12px;background:var(--okbg);border:1.5px solid #BFE3CD;border-radius:12px;padding:12px 16px}
+.answerbox.show{display:block}
+.answerbox b{color:var(--ok)}
+
+/* ---------- quiz ---------- */
+.quizhead{display:flex;flex-wrap:wrap;align-items:center;gap:12px;justify-content:space-between;background:var(--ac,var(--navy));color:#fff;border-radius:14px;padding:13px 18px;margin:16px 0 6px}
+.quizhead b{font-family:'Poppins',sans-serif;font-size:16.5px}
+.qscore{background:rgba(255,255,255,.16);border-radius:99px;padding:5px 14px;font-size:13.5px;font-weight:700;font-variant-numeric:tabular-nums}
+.qcard{background:var(--surface);border:1px solid var(--line);border-radius:15px;padding:17px 19px;margin:13px 0;box-shadow:0 1px 3px rgba(30,58,95,.05)}
+.qtop{display:flex;align-items:center;gap:10px;margin-bottom:8px;flex-wrap:wrap}
+.qnum{background:color-mix(in srgb,var(--ac,var(--navy)) 12%,#fff);color:var(--ac,var(--navy));font-weight:800;font-size:13px;border-radius:8px;padding:3px 11px}
+.qtype{font-size:12px;color:var(--ink2);border:1px solid var(--line);border-radius:99px;padding:2px 10px}
+.qbadge{margin-left:auto;font-weight:800;font-size:13.5px}
+.qbadge.ok{color:var(--ok)}.qbadge.bad{color:var(--bad)}
+.qtext{margin:4px 0 12px}
+.opts{display:grid;gap:9px}
+.opt{text-align:left;background:#FCFBF8;border:1.8px solid var(--line);border-radius:11px;padding:10px 14px;font-size:15px;cursor:pointer;color:var(--ink);transition:all .12s;display:flex;gap:10px;align-items:center}
+.opt .ol{font-weight:800;color:var(--ink2);flex:none}
+.opt:hover{border-color:var(--ac,var(--navy))}
+.opt.sel{border-color:var(--ac,var(--navy));background:color-mix(in srgb,var(--ac,var(--navy)) 7%,#fff)}
+.opt.right{border-color:var(--ok);background:var(--okbg)}
+.opt.wrong{border-color:var(--bad);background:var(--badbg)}
+.opt:disabled{cursor:default;opacity:.92}
+.qinput{width:100%;max-width:340px;border:1.8px solid var(--line);border-radius:11px;padding:10px 14px;font:inherit;font-weight:600;color:var(--ink);background:#FCFBF8;outline:none}
+.qinput:focus{border-color:var(--ac,var(--navy));background:#fff}
+.qinput:disabled{background:#F2EEE6}
+.qbtns{display:flex;gap:10px;margin-top:12px;flex-wrap:wrap}
+.feed{display:none;margin-top:11px;border-radius:11px;padding:10px 14px;font-weight:600;font-size:14.5px}
+.feed.show{display:block}
+.feed.good{background:var(--okbg);color:#1F6B3D;border:1px solid #CBE8D6}
+.feed.badd{background:var(--badbg);color:#8F3030;border:1px solid #F0C9C9}
+.sol{display:none;margin-top:11px;background:var(--soft);border-left:4px solid var(--ac,var(--navy));border-radius:0 11px 11px 0;padding:11px 15px;font-size:14.8px}
+.sol.show{display:block}
+.sol b{color:var(--ac,var(--navy))}
+.shake{animation:shake .3s}
+@keyframes shake{25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
+
+/* ---------- bottom nav & menu ---------- */
+.bottomnav{position:fixed;left:0;right:0;bottom:0;display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 16px;background:linear-gradient(to top,var(--bg) 65%,transparent);z-index:25;pointer-events:none}
+.navbtn{pointer-events:auto;background:var(--navy);color:#fff;border:none;border-radius:12px;padding:12px 20px;font-weight:700;font-size:15px;cursor:pointer;box-shadow:0 3px 10px rgba(30,58,95,.25)}
+.navbtn:hover:not(:disabled){filter:brightness(1.15)}
+.navbtn:disabled{opacity:.35;cursor:not-allowed;box-shadow:none}
+.keyhint{pointer-events:none;font-size:12.5px;color:var(--ink2);background:rgba(255,255,255,.85);border:1px solid var(--line);border-radius:99px;padding:5px 13px}
+@media(max-width:640px){.keyhint{display:none}.navbtn{padding:11px 14px;font-size:13.5px}}
+.menu{position:fixed;top:0;right:-360px;width:340px;max-width:88vw;height:100dvh;background:var(--surface);box-shadow:-8px 0 30px rgba(30,58,95,.18);z-index:60;transition:right .28s ease;display:flex;flex-direction:column}
+.menu.open{right:0}
+.menuhead{display:flex;justify-content:space-between;align-items:center;padding:16px 18px;border-bottom:1px solid var(--line)}
+.menuhead b{font-family:'Poppins',sans-serif;font-size:17px}
+.menulist{overflow-y:auto;padding:10px 14px 30px;flex:1}
+.mgroup{font-size:11.5px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--ink2);margin:16px 4px 6px}
+.mitem{display:flex;gap:10px;align-items:center;width:100%;text-align:left;background:none;border:none;border-radius:10px;padding:8px 10px;cursor:pointer;font-size:14.3px;color:var(--ink)}
+.mitem:hover{background:var(--soft)}
+.mitem .mnum{flex:none;width:26px;height:26px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;background:var(--soft);color:var(--ink2)}
+.mitem.active{background:color-mix(in srgb,var(--navy) 10%,#fff);font-weight:700}
+.mitem.active .mnum{background:var(--navy);color:#fff}
+.scrim{position:fixed;inset:0;background:rgba(20,35,60,.35);opacity:0;pointer-events:none;transition:opacity .25s;z-index:50}
+.scrim.show{opacity:1;pointer-events:auto}
+
+/* ---------- cover & closing ---------- */
+.cover{display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;min-height:72vh;gap:6px}
+.cover .sub{font-size:15px;font-weight:700;letter-spacing:.3em;text-transform:uppercase;color:var(--ac,var(--navy))}
+.cover h1{font-size:clamp(56px,11vw,110px);font-weight:800;letter-spacing:.06em;color:var(--ink);margin:.05em 0;line-height:1}
+.cover .desc{font-size:17.5px;color:var(--ink2);max-width:560px}
+.covermtx{margin:26px 0 10px;animation:float 5s ease-in-out infinite}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-9px)}}
+.topicgrid{display:grid;grid-template-columns:repeat(5,1fr);gap:9px;margin-top:22px;max-width:860px}
+@media(max-width:760px){.topicgrid{grid-template-columns:repeat(2,1fr)}}
+.tchip{background:#fff;border:1.5px solid var(--line);border-radius:11px;padding:9px 8px;font-size:12.8px;font-weight:600;color:var(--ink2)}
+.tchip b{display:block;color:var(--ink);font-size:13.2px}
+.bignum{font-size:34px;font-weight:800;font-family:'Poppins',sans-serif;color:var(--ac,var(--navy))}
+.summary{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+@media(max-width:760px){.summary{grid-template-columns:1fr}}
+.scard{background:#fff;border:1px solid var(--line);border-left:5px solid var(--sc,var(--navy));border-radius:13px;padding:13px 16px}
+.scard b{font-size:14.8px}
+.scard p{font-size:13.8px;color:var(--ink2);margin:3px 0 0}
+.thanks{text-align:center;padding:40px 10px 20px}
+.thanks h2{font-size:clamp(34px,5.5vw,54px)}
+.emojis{font-size:34px;letter-spacing:10px;margin:8px 0 2px}
+.rate{display:flex;gap:12px;justify-content:flex-start;flex-wrap:wrap;margin:8px 0 4px}
+.rate button{font-size:30px;background:#fff;border:2px solid var(--line);border-radius:14px;width:62px;height:62px;cursor:pointer;transition:all .12s}
+.rate button:hover{transform:translateY(-3px)}
+.rate button.on{border-color:var(--ac,var(--navy));background:color-mix(in srgb,var(--ac,var(--navy)) 10%,#fff)}
+.checks{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin:10px 0}
+@media(max-width:640px){.checks{grid-template-columns:1fr}}
+.checks label{display:flex;gap:9px;align-items:center;font-size:14.3px;background:#fff;border:1px solid var(--line);border-radius:10px;padding:8px 12px;cursor:pointer}
+textarea.ref{width:100%;min-height:84px;border:1.8px solid var(--line);border-radius:12px;padding:12px 14px;font:inherit;resize:vertical;outline:none;background:#FCFBF8}
+textarea.ref:focus{border-color:var(--ac,var(--navy))}
+.divider{height:1px;background:var(--line);margin:22px 0}
+</style>
+</head>
+<body>
+<div id="app">
+  <header class="topbar">
+    <button id="menuBtn" class="iconbtn" title="Daftar slide (menu)">&#9776;</button>
+    <div class="pwrap"><div id="pfill"></div></div>
+    <span id="counter" class="counter">1 / 1</span>
+  </header>
+  <main id="stage"></main>
+  <nav class="bottomnav">
+    <button id="prevBtn" class="navbtn">&#8592; Sebelumnya</button>
+    <span class="keyhint">Gunakan tombol &#8592; &#8594; pada keyboard untuk berpindah slide</span>
+    <button id="nextBtn" class="navbtn">Berikutnya &#8594;</button>
+  </nav>
+  <aside id="menu" class="menu">
+    <div class="menuhead"><b>Daftar Slide</b><button id="menuClose" class="iconbtn" title="Tutup">&times;</button></div>
+    <div id="menulist" class="menulist"></div>
+  </aside>
+  <div id="scrim" class="scrim"></div>
+</div>
+<script>
+/* ================= HELPER RENDERING ================= */
+var QUIZ={};
+function mx(d,o){
+  o=o||{};
+  var r=d.length,c=d[0].length,i,j,cls='mtx'+(o.big?' big':''),cells='';
+  for(i=0;i<r;i++){
+    for(j=0;j<c;j++){
+      var hcl='';
+      if(o.hl){
+        if(o.hl(i,j)) hcl=' '+(o.hlclass||'hl');
+      }
+      var cell=o.cells&&o.cells(i,j);
+      cells+='<span class="mc'+hcl+(cell?' '+cell:'')+'" data-i="'+i+'" data-j="'+j+'">'+d[i][j]+'</span>';
+    }
+  }
+  return '<span class="'+cls+'"><span class="mtx-l"></span><span class="mtx-g" style="grid-template-columns:repeat('+c+',auto)">'+cells+'</span><span class="mtx-r"></span></span>';
+}
+function sub2(i,j){return '<sub>'+i+j+'</sub>';}
+function frac(p,q){
+  var neg=(p<0)!==(q<0); p=Math.abs(p); q=Math.abs(q);
+  var g=function(a,b){return b?g(b,a%b):a;}, gg=g(p,q)||1; p/=gg; q/=gg;
+  if(q===1) return (neg?'&minus;':'')+p;
+  return (neg?'&minus;':'')+'<span class="frac"><span>'+p+'</span><span>'+q+'</span></span>';
+}
+function norm(s){
+  return String(s).toLowerCase().replace(/[\s,\.]/g,'').replace(/\u00d7/g,'x').replace(/\u2212/g,'-').replace(/\u2013/g,'-');
+}
+function checkInput(val,acc){
+  var v=norm(val); if(!v) return false;
+  if(typeof acc==='string') acc=[acc];
+  return acc.some(function(a){return norm(a)===v;});
+}
+function steppersHTML(id,r,c,mat){
+  var h='<span class="mtx big" data-st="'+id+'"><span class="mtx-l"></span><span class="mtx-g" style="grid-template-columns:repeat('+c+',auto)">';
+  for(var i=0;i<r;i++)for(var j=0;j<c;j++)
+    h+='<span class="stepper mc"><button class="sdec" data-i="'+i+'" data-j="'+j+'">&minus;</button><b class="sv">'+mat[i][j]+'</b><button class="sinc" data-i="'+i+'" data-j="'+j+'">+</button></span>';
+  return h+'</span><span class="mtx-r"></span></span>';
+}
+function clamp9(v){return Math.max(-9,Math.min(9,v));}
+function par(v){return v<0?'('+v+')':String(v);}
+/* ================= WIDGETS BAGIAN 1 ================= */
+var WIDGETS={};
+
+/* W1: Penjelajah matriks — klik elemen (Materi 1) */
+function aij(i,j){return 'a<sub>'+i+j+'</sub>';}
+WIDGETS.definisi=function(el){
+  var A=[[5,-2,8],[1,4,-6],[0,3,7]], paren=false, cur={i:-1,j:-1};
+  function infoHTML(){
+    if(cur.i<0)return '<b>Mulai jelajah!</b><br>Klik salah satu angka pada matriks untuk melihat nama elemennya (misalnya a<sub>23</sub>) dan posisinya.';
+    var i=cur.i,j=cur.j,v=A[i][j];
+    return 'Elemen yang kamu klik: <b>'+aij(i+1,j+1)+' = '+v+'</b><br>'+
+      'Indeks pertama ('+(i+1)+') = <b>baris ke-'+(i+1)+'</b> &middot; Indeks kedua ('+(j+1)+') = <b>kolom ke-'+(j+1)+'</b>.<br>'+
+      'Dibaca: "a-'+(i+1)+'-'+(j+1)+'", elemen matriks A pada baris ke-'+(i+1)+' kolom ke-'+(j+1)+'.';
+  }
+  function render(){
+    el.innerHTML='<div class="wbox"><h4>Penjelajah Matriks &mdash; klik angkanya!</h4>'+
+      '<div class="wrow"><div>'+
+      mx(A,{big:1,cells:function(i,j){return (cur.i===i&&cur.j===j)?'bcell pick':'bcell';}})+
+      '<div class="pills" style="margin-top:10px"><button class="pill'+(paren?'':' on')+'" data-b="siku">Kurung siku [ ]</button>'+
+      '<button class="pill'+(paren?' on':'')+'" data-b="kurung">Kurung biasa ( )</button></div>'+
+      '<p class="muted small">Matriks A &mdash; dua tanda kurung ini sama-sama benar.</p></div>'+
+      '<div class="winfo" id="wdef-info">'+infoHTML()+'</div>'+
+      '</div></div>';
+    el.querySelectorAll('.mc.bcell').forEach(function(c){
+      c.addEventListener('click',function(){cur={i:+c.dataset.i,j:+c.dataset.j};render();});
+    });
+    el.querySelectorAll('[data-b]').forEach(function(b){
+      b.addEventListener('click',function(){ paren=(b.dataset.b==='kurung'); render(); });
+    });
+  }
+  render();
+};
+
+/* W2: Komponen matriks — elemen, ordo, diagonal (Materi 2) */
+WIDGETS.komponen=function(el){
+  var A=[[8,-3,1],[5,2,9],[0,4,7]], diag=false, cur={i:-1,j:-1};
+  function infoHTML(){
+    if(cur.i<0)return '<b>Klik sebuah elemen</b><br>Panel ini akan menunjukkan indeks baris, indeks kolom, dan nama elemennya.';
+    var i=cur.i,j=cur.j,v=A[i][j],dg=(i===j);
+    return aij(i+1,j+1)+' = <b>'+v+'</b><br>'+
+      'Baris ke-'+(i+1)+', kolom ke-'+(j+1)+(dg?' &mdash; termasuk <b>elemen diagonal utama</b>!':' &mdash; elemen <b>non-diagonal</b>.')+
+      (dg?'':'<br>Elemen diagonal utama pada baris yang sama: '+aij(i+1,i+1)+' = '+A[i][i]);
+  }
+  function render(){
+    el.innerHTML='<div class="wbox"><h4>Anatomi Matriks M</h4><div class="wrow"><div>'+
+      mx(A,{big:1,cells:function(i,j){
+        var c='bcell';
+        if(diag&&i===j)c+=' hl';
+        if(cur.i===i&&cur.j===j)c+=' pick';
+        return c;
+      }})+
+      '<p class="muted small" style="text-align:center">Matriks M (klik angkanya)</p></div>'+
+      '<div class="winfo" id="wkom-info">'+infoHTML()+'</div></div>'+
+      '<div class="kv" style="margin-top:14px">'+
+      '<span class="tag">Ordo: 3 &times; 3</span><span class="tag">3 baris</span><span class="tag">3 kolom</span><span class="tag">9 elemen</span>'+
+      '<label style="display:flex;gap:8px;align-items:center;font-size:14px;font-weight:600;cursor:pointer"><input type="checkbox" id="wkom-diag"'+(diag?' checked':'')+'> Sorot diagonal utama</label></div>'+
+      '<p class="muted small" style="margin-top:8px">Matriks persegi 3&times;3 punya <b>diagonal utama</b>: '+aij(1,1)+', '+aij(2,2)+', '+aij(3,3)+' (dari kiri-atas ke kanan-bawah).</p></div>';
+    el.querySelectorAll('.mc.bcell').forEach(function(c){
+      c.addEventListener('click',function(){cur={i:+c.dataset.i,j:+c.dataset.j};render();});
+    });
+    el.querySelector('#wkom-diag').addEventListener('change',function(e){diag=e.target.checked;render();});
+  }
+  render();
+};
+
+/* W3: Baris & kolom — sorot + tantangan klik posisi (Materi 3) */
+WIDGETS.bariskolom=function(el){
+  var A=[[3,-1,4,0],[2,5,-6,1],[7,0,2,8]];
+  var targets=[[1,3],[2,4],[3,1],[2,2],[1,4],[3,4],[1,1],[3,2]],ti=0,mode=null,mk=-1;
+  function render(){
+    el.innerHTML='<div class="wbox"><h4>Laboratorium Baris &amp; Kolom</h4>'+
+      '<div class="pills"><span style="align-self:center;font-weight:700;font-size:13.5px">Sorot:</span>'+
+      [1,2,3].map(function(n){return '<button class="pill'+(mode==='r'&&mk===n-1?' on':'')+'" data-r="'+n+'">Baris '+n+'</button>';}).join('')+
+      [1,2,3,4].map(function(n){return '<button class="pill'+(mode==='c'&&mk===n-1?' on':'')+'" data-c="'+n+'">Kolom '+n+'</button>';}).join('')+
+      '<button class="pill" data-x="1">Bersihkan</button></div>'+
+      '<div class="wrow"><div>'+
+      mx(A,{big:1,cells:function(i,j){
+        var c='bcell';
+        if(mode==='r'&&i===mk)c+=' hl';
+        if(mode==='c'&&j===mk)c+=' hl';
+        return c;
+      }})+'</div><div class="winfo" id="wbk-info"></div></div></div>';
+    var t=targets[ti];
+    el.querySelector('#wbk-info').innerHTML='<b>Tantangan klik posisi!</b><br>Klik elemen pada posisi <b>'+aij(t[0]+1,t[1]+1)+'</b> &mdash; artinya baris ke-'+t[0]+', kolom ke-'+t[1]+'.';
+    el.querySelectorAll('[data-r]').forEach(function(b){b.addEventListener('click',function(){mode='r';mk=+b.dataset.r-1;render();});});
+    el.querySelectorAll('[data-c]').forEach(function(b){b.addEventListener('click',function(){mode='c';mk=+b.dataset.c-1;render();});});
+    el.querySelector('[data-x]').addEventListener('click',function(){mode=null;mk=-1;render();});
+    el.querySelectorAll('.mc.bcell').forEach(function(c){
+      c.addEventListener('click',function(){
+        var i=+c.dataset.i+1,j=+c.dataset.j+1,info=el.querySelector('#wbk-info');
+        if(t[0]===i&&t[1]===j){
+          ti=(ti+1)%targets.length;
+          info.innerHTML='<b style="color:var(--ok)">Benar! '+aij(i,j)+' = '+A[i-1][j-1]+'</b> memang di baris ke-'+i+', kolom ke-'+j+'.<br>Tantangan berikutnya: klik <b>'+aij(targets[ti][0]+1,targets[ti][1]+1)+'</b>';
+        }else{
+          info.innerHTML='<b style="color:var(--bad)">Belum tepat.</b> Kamu mengklik '+aij(i,j)+' (baris '+i+', kolom '+j+').<br>Cari lagi: <b>'+aij(t[0]+1,t[1]+1)+'</b> = baris ke-'+t[0]+', kolom ke-'+t[1]+'.';
+        }
+      });
+    });
+  }
+  render();
+};
+
+/* W4: Jenis matriks berdasarkan ordo (Materi 4a) */
+WIDGETS.jenisOrdo=function(el){
+  var data=[
+    {n:'Matriks Baris',d:'Hanya punya 1 baris. Ordo 1 &times; n.',m:[[2,5,9]]},
+    {n:'Matriks Kolom',d:'Hanya punya 1 kolom. Ordo m &times; 1.',m:[[4],[-1],[7]]},
+    {n:'Matriks Persegi',d:'Baris = kolom (m = n). Punya diagonal utama.',m:[[3,8],[1,6]]},
+    {n:'Persegi Panjang',d:'Baris &ne; kolom (m &ne; n). Tidak punya diagonal utama.',m:[[5,2,0],[3,7,1]]}
+  ];
+  var cur=2;
+  function render(){
+    el.innerHTML='<div class="wbox"><h4>Galeri Jenis Matriks (menurut Ordo) &mdash; klik kartunya</h4>'+
+      '<div class="gallery">'+data.map(function(g,i){
+        return '<div class="gcard'+(i===cur?' on':'')+'" data-g="'+i+'"><b>'+g.n+'</b><span>'+g.d+'</span></div>';
+      }).join('')+'</div>'+
+      '<div class="wex"><div>'+mx(data[cur].m,{big:1})+'</div>'+
+      '<div style="flex:1;min-width:220px"><b>'+data[cur].n+'</b><p class="small" style="margin:4px 0">'+data[cur].d+'</p>'+
+      '<span class="tag">Ordo: '+data[cur].m.length+' &times; '+data[cur].m[0].length+'</span></div></div></div>';
+    el.querySelectorAll('[data-g]').forEach(function(c){
+      c.addEventListener('click',function(){cur=+c.dataset.g;render();});
+    });
+  }
+  render();
+};
+
+/* W5: Jenis matriks berdasarkan sifat/elemen (Materi 4b) */
+WIDGETS.jenisSifat=function(el){
+  var data=[
+    {n:'Matriks Nol (O)',m:[[0,0,0],[0,0,0]],d:'Semua elemennya 0. Ditulis O, mengikuti ordo matriksnya.',hl:function(){return false;},hlc:'dim'},
+    {n:'Matriks Diagonal',m:[[6,0,0],[0,-2,0],[0,0,9]],d:'Wajib persegi. Elemen di luar diagonal utama semuanya 0; elemen diagonal bebas.',hl:function(i,j){return i===j;}},
+    {n:'Matriks Skalar',m:[[4,0],[0,4]],d:'Matriks diagonal dengan semua elemen diagonalnya SAMA.',hl:function(i,j){return i===j;}},
+    {n:'Matriks Identitas (I)',m:[[1,0,0],[0,1,0],[0,0,1]],d:'Matriks skalar dengan diagonal 1. Seperti "angka 1"-nya matriks.',hl:function(i,j){return i===j;}},
+    {n:'Segitiga Atas',m:[[2,5,1],[0,3,7],[0,0,4]],d:'Persegi; semua elemen DI BAWAH diagonal utama = 0.',hl:function(i,j){return i>j;},hlc:'dim'},
+    {n:'Segitiga Bawah',m:[[2,0,0],[5,3,0],[1,7,4]],d:'Persegi; semua elemen DI ATAS diagonal utama = 0.',hl:function(i,j){return i<j;},hlc:'dim'},
+    {n:'Matriks Simetri',m:[[1,4,2],[4,0,5],[2,5,3]],d:'Persegi dengan A = A<sup>T</sup>. Elemen bercermin terhadap diagonal bernilai sama ('+aij(1,2)+' = '+aij(2,1)+', dst).',hl:function(i,j){return i!==j&&(i+j)===1;},hlc:'twin'}
+  ];
+  var cur=1;
+  function render(){
+    var g=data[cur];
+    el.innerHTML='<div class="wbox"><h4>Kartu Sifat Matriks &mdash; klik tombolnya</h4>'+
+      '<div class="pills">'+data.map(function(x,i){return '<button class="pill'+(i===cur?' on':'')+'" data-k="'+i+'">'+x.n+'</button>';}).join('')+'</div>'+
+      '<div class="wex"><div>'+mx(g.m,{big:1,hl:g.hl,hlclass:g.hlc||'hl'})+'</div>'+
+      '<div style="flex:1;min-width:240px"><b>'+g.n+'</b><p class="small" style="margin:4px 0">'+g.d+'</p>'+
+      '<span class="tag">Ordo '+g.m.length+' &times; '+g.m[0].length+'</span></div></div>'+
+      '<p class="muted small" style="margin-top:10px">Warna sorot = bagian penting; abu-abu redup = elemen yang harus 0.</p></div>';
+    el.querySelectorAll('[data-k]').forEach(function(b){
+      b.addEventListener('click',function(){cur=+b.dataset.k;render();});
+    });
+  }
+  render();
+};
+/* ================= WIDGETS BAGIAN 2 ================= */
+
+/* W6: Pemeriksa kesamaan dua matriks (Materi 5) */
+WIDGETS.kesamaan=function(el){
+  var A=[[3,4],[1,2]], B=[[3,4],[1,5]];
+  function same(){
+    for(var i=0;i<2;i++)for(var j=0;j<2;j++)if(A[i][j]!==B[i][j])return false;
+    return true;
+  }
+  function diffs(){
+    var d=[];
+    for(var i=0;i<2;i++)for(var j=0;j<2;j++)if(A[i][j]!==B[i][j])d.push([i,j]);
+    return d;
+  }
+  function render(){
+    var df=diffs(),ok=same();
+    el.innerHTML='<div class="wbox"><h4>Detektif Kesamaan: A = B ?</h4><div class="wrow">'+
+      '<div style="text-align:center">'+mx(A,{big:1})+'<p class="muted small">Matriks A (tetap)</p></div>'+
+      '<div style="font-size:34px;align-self:center;font-weight:800;color:'+(ok?'var(--ok)':'var(--bad)')+'">'+(ok?'=':'&ne;')+'</div>'+
+      '<div style="text-align:center">'+steppersHTML('kb',2,2,B)+'<p class="muted small">Matriks B (atur dengan &plusmn;)</p></div>'+
+      '<div class="winfo" id="wks-info"></div></div>'+
+      '<p class="muted small" style="margin-top:10px">Cek otomatis: ordo sama (2&times;2 = 2&times;2) &check; lalu bandingkan elemen seletak.</p></div>';
+    var info=el.querySelector('#wks-info');
+    if(ok){
+      info.innerHTML='<b style="color:var(--ok)">SAMA! A = B</b><br>Kedua syarat terpenuhi: ordonya sama dan semua elemen seletak bernilai sama.<br>'+aij(2,2)+'(A) = 2 dan '+aij(2,2)+'(B) = 2 &check;';
+    }else{
+      var r=df.map(function(p){return aij(p[0]+1,p[1]+1)+': A = '+A[p[0]][p[1]]+' sedangkan B = <b>'+B[p[0]][p[1]]+'</b>';}).join('<br>');
+      info.innerHTML='<b style="color:var(--bad)">BELUM SAMA</b><br>Elemen yang berbeda:<br>'+r+'<br><span class="muted small">Perbaiki lewat tombol &plusmn; hingga status berubah.</span>';
+    }
+    el.querySelectorAll('.sdec,.sinc').forEach(function(b){
+      b.addEventListener('click',function(){
+        var i=+b.dataset.i,j=+b.dataset.j;
+        B[i][j]=clamp9(B[i][j]+(b.className.indexOf('sinc')>-1?1:-1));
+        render();
+      });
+    });
+  }
+  render();
+};
+
+/* W7: Kalkulator penjumlahan (Materi 6) */
+WIDGETS.jumlah=function(el){
+  var A=[[2,-1],[3,4]],B=[[5,0],[-2,1]],last=[0,0];
+  function sum(i,j){return A[i][j]+B[i][j];}
+  function render(){
+    var C=[[sum(0,0),sum(0,1)],[sum(1,0),sum(1,1)]];
+    el.innerHTML='<div class="wbox"><h4>Kalkulator A + B (atur angkanya!)</h4><div class="wrow">'+
+      '<div style="text-align:center">'+steppersHTML('ja',2,2,A)+'<p class="muted small">A</p></div>'+
+      '<div style="font-size:30px;align-self:center;font-weight:800">+</div>'+
+      '<div style="text-align:center">'+steppersHTML('jb',2,2,B)+'<p class="muted small">B</p></div>'+
+      '<div style="font-size:30px;align-self:center;font-weight:800">=</div>'+
+      '<div style="text-align:center">'+mx(C,{big:1,hl:function(i,j){return i===last[0]&&j===last[1];}})+'<p class="muted small">A + B (otomatis)</p></div>'+
+      '<div class="winfo" id="wjm-info"></div></div>'+
+      '<p class="muted small" style="margin-top:10px">Sifat: A + B = B + A (komutatif) &middot; A + O = A &middot; A + (&minus;A) = O</p></div>';
+    var li=last[0],lj=last[1];
+    el.querySelector('#wjm-info').innerHTML='<b>Cara menghitung elemen yang disorot:</b><br>'+
+      'c'+sub2(li+1,lj+1)+' = a'+sub2(li+1,lj+1)+' + b'+sub2(li+1,lj+1)+'<br>= '+par(A[li][lj])+' + '+par(B[li][lj])+' = <b>'+C[li][lj]+'</b><br>'+
+      '<span class="muted small">Setiap elemen hasil = jumlah elemen A dan B yang SELETAK.</span>';
+    el.querySelectorAll('.sdec,.sinc').forEach(function(b){
+      b.addEventListener('click',function(){
+        var i=+b.dataset.i,j=+b.dataset.j,d=(b.className.indexOf('sinc')>-1?1:-1);
+        if(b.closest('[data-st="ja"]'))A[i][j]=clamp9(A[i][j]+d); else B[i][j]=clamp9(B[i][j]+d);
+        last=[i,j]; render();
+      });
+    });
+  }
+  render();
+};
+
+/* W8: Kalkulator pengurangan + toggle A−B / B−A (Materi 7) */
+WIDGETS.kurang=function(el){
+  var A=[[7,2],[-3,5]],B=[[4,6],[1,-2]],mode='AB',last=[0,0];
+  function calc(i,j){return mode==='AB'?(A[i][j]-B[i][j]):(B[i][j]-A[i][j]);}
+  function render(){
+    var C=[[calc(0,0),calc(0,1)],[calc(1,0),calc(1,1)]];
+    var lbl=mode==='AB'?'A &minus; B':'B &minus; A';
+    el.innerHTML='<div class="wbox"><h4>Kalkulator Pengurangan</h4>'+
+      '<div class="pills"><button class="pill'+(mode==='AB'?' on':'')+'" data-m="AB">A &minus; B</button><button class="pill'+(mode==='BA'?' on':'')+'" data-m="BA">B &minus; A</button></div>'+
+      '<div class="wrow">'+
+      '<div style="text-align:center">'+steppersHTML('ka',2,2,A)+'<p class="muted small">A</p></div>'+
+      '<div style="font-size:30px;align-self:center;font-weight:800">'+(mode==='AB'?'&minus;':'&minus;')+'</div>'+
+      '<div style="text-align:center">'+steppersHTML('kb2',2,2,B)+'<p class="muted small">B</p></div>'+
+      '<div style="font-size:30px;align-self:center;font-weight:800">=</div>'+
+      '<div style="text-align:center">'+mx(C,{big:1,hl:function(i,j){return i===last[0]&&j===last[1];}})+'<p class="muted small">'+lbl+'</p></div>'+
+      '<div class="winfo" id="wkq-info"></div></div>'+
+      '<p class="muted small" style="margin-top:10px">Awas: pengurangan TIDAK komutatif. Coba toggle B &minus; A: hasilnya berlawanan tanda dengan A &minus; B, karena B &minus; A = &minus;(A &minus; B).</p></div>';
+    var li=last[0],lj=last[1],x=mode==='AB'?A[li][lj]:B[li][lj],y=mode==='AB'?B[li][lj]:A[li][lj];
+    el.querySelector('#wkq-info').innerHTML='<b>Elemen yang disorot:</b><br>'+
+      (mode==='AB'?'c'+sub2(li+1,lj+1)+' = a'+sub2(li+1,lj+1)+' &minus; b'+sub2(li+1,lj+1):'c'+sub2(li+1,lj+1)+' = b'+sub2(li+1,lj+1)+' &minus; a'+sub2(li+1,lj+1))+
+      '<br>= '+x+' &minus; '+par(y)+' = '+x+' + '+par(-y)+' = <b>'+C[li][lj]+'</b>';
+    el.querySelectorAll('[data-m]').forEach(function(b){
+      b.addEventListener('click',function(){mode=b.dataset.m;render();});
+    });
+    el.querySelectorAll('.sdec,.sinc').forEach(function(b){
+      b.addEventListener('click',function(){
+        var i=+b.dataset.i,j=+b.dataset.j,d=(b.className.indexOf('sinc')>-1?1:-1);
+        if(b.closest('[data-st="ka"]'))A[i][j]=clamp9(A[i][j]+d); else B[i][j]=clamp9(B[i][j]+d);
+        last=[i,j]; render();
+      });
+    });
+  }
+  render();
+};
+
+/* W9: Perkalian skalar dengan slider (Materi 8) */
+WIDGETS.skalar=function(el){
+  var A=[[3,-1],[2,5],[0,4]],k=2,pick=[0,0];
+  function render(){
+    var K=A.map(function(row){return row.map(function(v){return k*v;});});
+    el.innerHTML='<div class="wbox"><h4>Mesin Skalar: k &times; A</h4>'+
+      '<div class="wrow"><div style="text-align:center">'+
+      mx(A,{big:1,cells:function(i,j){return (i===pick[0]&&j===pick[1])?'pick':'';}})+'<p class="muted small">A (klik satu elemen)</p></div>'+
+      '<div style="flex:1;min-width:230px"><div class="kv"><span class="tag" style="font-size:16px">k = '+k+'</span></div>'+
+      '<input type="range" class="slider" min="-5" max="5" step="1" value="'+k+'" id="wsk-k">'+
+      '<p class="muted small">Geser nilai k dari &minus;5 sampai 5.</p>'+
+      '<div class="winfo" id="wsk-info" style="min-height:auto"></div></div>'+
+      '<div style="text-align:center">'+mx(K,{big:1})+'<p class="muted small">k &times; A</p></div></div></div>';
+    var i=pick[0],j=pick[1];
+    el.querySelector('#wsk-info').innerHTML='Contoh elemen yang dipilih: a'+sub2(i+1,j+1)+' = '+A[i][j]+'.<br>'+
+      'Maka elemen hasil: <b>'+k+' &times; '+par(A[i][j])+' = '+(k*A[i][j])+'</b> &mdash; begitu pula semua elemen lain.<br>'+
+      '<span class="muted small">'+(k<0?'k negatif membalik tanda semua elemen.':'Setiap elemen dikali k, bentuk matriks tidak berubah.')+'</span>';
+    el.querySelector('#wsk-k').addEventListener('input',function(e){k=+e.target.value;render();});
+    el.querySelectorAll('.mc.bcell').forEach(function(c){
+      c.addEventListener('click',function(){pick=[+c.dataset.i,+c.dataset.j];render();});
+    });
+  }
+  render();
+};
+
+/* W10: Pembagian matriks dengan skalar + mitos/fakta (Materi 9) */
+WIDGETS.bagi=function(el){
+  var A=[[12,-9],[6,3]],ks=[1,2,3,4,6,-2],k=2,myt=0;
+  var myths=[
+    {s:'"Matriks A boleh dibagi oleh matriks B, tulis saja A &divide; B."',benar:false,j:"MITOS. Pembagian antar dua matriks tidak didefinisikan. Penggantinya: kalikan dengan invers B<sup>&minus;1</sup> (dipelajari setelah materi ini)."},
+    {s:'"Membagi matriks dengan skalar 5 sama saja dengan mengalinya dengan 1/5."',benar:true,j:"FAKTA. A : 5 = (1/5)A &mdash; setiap elemen dibagi 5."},
+    {s:'"Matriks apa pun boleh dibagi dengan skalar 0."',benar:false,j:"MITOS. Pembagian oleh nol tidak terdefinisi, termasuk pada matriks."}
+  ];
+  function render(){
+    var K=A.map(function(row){return row.map(function(v){return frac(v,k);});});
+    var m=myths[myt];
+    el.innerHTML='<div class="wbox"><h4>Mesin Bagi Skalar A : k</h4>'+
+      '<div class="wrow"><div style="text-align:center">'+mx(A,{big:1})+'<p class="muted small">A</p></div>'+
+      '<div style="align-self:center"><div class="pills" style="flex-direction:column">'+ks.map(function(v){return '<button class="pill'+(v===k?' on':'')+'" data-k="'+v+'">k = '+v+'</button>';}).join('')+'</div></div>'+
+      '<div style="text-align:center">'+mx(K,{big:1})+'<p class="muted small">A : k &nbsp;(sama dengan <span class="frac"><span>1</span><span>'+Math.abs(k)+'</span></span>'+(k<0?'&times;(&minus;1)':'')+' &times; A)</p></div>'+
+      '<div class="winfo" style="min-height:auto"><b>Perhatikan:</b><br>Hasil bagi ditampilkan sebagai pecahan bila tidak habis dibagi. Semua elemen dibagi k dengan aturan yang sama.</div></div>'+
+      '<div class="divider"></div><b style="font-family:Poppins,sans-serif;font-size:15px;color:var(--ac,var(--navy))">Mitos atau Fakta? &mdash; putuskan sendiri lalu lihat penjelasannya</b>'+
+      '<div class="card" style="margin:10px 0"><p>'+m.s+'</p><div class="qbtns"><button class="btn ghost" data-my="1">FAKTA</button><button class="btn ghost" data-my="0">MITOS</button></div>'+
+      '<div class="feed" id="wbg-feed"></div></div></div>';
+    el.querySelectorAll('[data-k]').forEach(function(b){
+      b.addEventListener('click',function(){k=+b.dataset.k;render();});
+    });
+    el.querySelectorAll('[data-my]').forEach(function(b){
+      b.addEventListener('click',function(){
+        var f=el.querySelector('#wbg-feed'),benar=(b.dataset.my==='1');
+        f.className='feed show '+(benar===m.benar?'good':'badd');
+        f.innerHTML=(benar===m.benar?'Tepat! ':'Kurang tepat. ')+m.j;
+      });
+    });
+  }
+  render();
+};
+
+/* W11: Animasi transpose (Materi 10) */
+WIDGETS.transpos=function(el){
+  var A=[[2,7],[-1,4],[5,0]],show=false,pick=null;
+  function infoHTML(){
+    if(!pick)return '<b>Belum ada elemen dipilih.</b><br>Klik sel pada matriks A untuk melihat posisi asalnya'+(show?', lalu lihat ke mana ia pindah pada A<sup>T</sup>.':'.');
+    var i=pick[0],j=pick[1];
+    return 'a'+sub2(i+1,j+1)+' = '+A[i][j]+' berada di baris '+(i+1)+', kolom '+(j+1)+'.<br>'+
+      (show?'Pada A<sup>T</sup> ia menjadi <b>'+aij(j+1,i+1)+' = '+A[i][j]+'</b> (baris '+(j+1)+', kolom '+(i+1)+').':'Tekan Transpose! untuk melihat ke mana elemen ini pindah.');
+  }
+  function render(){
+    var T=[[A[0][0],A[1][0],A[2][0]],[A[0][1],A[1][1],A[2][1]]];
+    el.innerHTML='<div class="wbox"><h4>Mesin Transpose</h4>'+
+      '<div class="wrow">'+
+      '<div style="text-align:center">'+mx(A,{big:1,cells:function(i,j){return 'r'+i+' bcell';}})+'<p class="muted small">A (3&times;2) &mdash; warna = asal barisnya</p></div>'+
+      '<div style="align-self:center"><button class="btn" id="wtp-go">'+(show?'Kembali ke A':'Transpose!')+'</button></div>'+
+      '<div style="text-align:center">'+(show?mx(T,{big:1,cells:function(i,j){return 'r'+j+((pick&&pick[0]===i&&pick[1]===j)?' pick':'');}})+'<p class="muted small">A<sup>T</sup> (2&times;3) &mdash; warna mengikuti baris asal</p>':'<div class="winfo" style="align-self:center"><b>Belum ditranspose.</b><br>Tekan tombol Transpose! dan amati: baris ke-1 A (biru) pindah menjadi kolom ke-1 A<sup>T</sup>, dst.</div>')+'</div>'+
+      '<div class="winfo" id="wtp-info" style="min-height:auto">'+infoHTML()+'</div></div>'+
+      '<p class="muted small" style="margin-top:10px">Rumus kunci: (A<sup>T</sup>)'+sub2(2,1)+' = a'+sub2(1,2)+' &mdash; indeks baris &amp; kolom saling bertukar. Klik sel pada matriks A untuk melihat pasangannya.</p></div>';
+    el.querySelector('#wtp-go').addEventListener('click',function(){show=!show;render();});
+    el.querySelectorAll('.mc.bcell').forEach(function(c){
+      c.addEventListener('click',function(){
+        var i=+c.dataset.i,j=+c.dataset.j;
+        pick=show?[j,i]:[i,j];
+        render();
+      });
+    });
+  }
+  render();
+};
+
+/* W12: Refleksi diri */
+WIDGETS.refleksi=function(el){
+  var rate=0,topik=['Definisi & penulisan matriks','Komponen: elemen, ordo, diagonal','Baris & kolom','Jenis-jenis matriks','Kesamaan dua matriks','Penjumlahan matriks','Pengurangan matriks','Perkalian dengan skalar','Pembagian matriks','Transpose matriks'];
+  el.innerHTML='<div class="wbox"><h4>Lembar Refleksi</h4>'+
+    '<b style="font-size:14.5px">1. Bagaimana perasaanmu setelah belajar hari ini?</b>'+
+    '<div class="rate">'+['&#128533;','&#128528;','&#128522;','&#129321;'].map(function(e,i){return '<button data-r="'+(i+1)+'" title="'+(i+1)+'">'+e+'</button>';}).join('')+'</div>'+
+    '<p class="muted small" id="wrf-rate">Belum dipilih</p>'+
+    '<b style="font-size:14.5px">2. Materi mana yang masih membingungkan? (boleh lebih dari satu)</b>'+
+    '<div class="checks">'+topik.map(function(t,i){return '<label><input type="checkbox" value="'+i+'"> '+t+'</label>';}).join('')+'</div>'+
+    '<b style="font-size:14.5px">3. Tuliskan satu hal menarik yang kamu pelajari hari ini:</b>'+
+    '<textarea class="ref" id="wrf-text" placeholder="Contoh: aku baru tahu kalau matriks tidak punya operasi pembagian..."></textarea>'+
+    '<div class="qbtns"><button class="btn" id="wrf-send">Kirim Refleksi</button></div>'+
+    '<div class="feed" id="wrf-feed"></div></div>';
+  el.querySelectorAll('[data-r]').forEach(function(b){
+    b.addEventListener('click',function(){
+      el.querySelectorAll('[data-r]').forEach(function(x){x.classList.remove('on');});
+      b.classList.add('on'); rate=+b.dataset.r;
+      el.querySelector('#wrf-rate').innerHTML=['Masih bingung, perlu bantuan','Lumayan, ada yang harus diulang','Paham dengan baik','Sangat paham, siap lanjut!'][rate-1];
+    });
+  });
+  el.querySelector('#wrf-send').addEventListener('click',function(){
+    var ck=[].slice.call(el.querySelectorAll('.checks input:checked')).map(function(c){return topik[+c.value];});
+    var tx=el.querySelector('#wrf-text').value.trim();
+    if(!rate){var f=el.querySelector('#wrf-feed');f.className='feed show badd';f.innerHTML='Pilih dulu perasaanmu di nomor 1 ya!';return;}
+    el.querySelector('#wrf-feed').className='feed show good';
+    el.querySelector('#wrf-feed').innerHTML='<b>Terima kasih atas refleksinya!</b><br>'+
+      (rate>=3?'Keren, semangat belajarmu terjaga. ':('Catatan: perbanyak latihan di materi: '+(ck.length?ck.join(', '):'semua materi hari ini')+'. '))+
+      (tx?'Menarik juga pendapatmu: "'+tx.replace(/</g,'&lt;')+'"':'')+'<br><span class="muted small">Refleksi ini tersimpan hanya di perangkatmu (tidak dikirim ke mana pun).</span>';
+  });
+};
+
+/* W13: Teaser perkalian dua matriks */
+WIDGETS.dot=function(el){
+  var step=0;
+  function render(){
+    var rows=[[2,3]],cols=[[4],[5]];
+    el.innerHTML='<div class="wbox"><h4>Cuplikan: Baris &times; Kolom (baris dot kolom)</h4>'+
+      '<div class="wrow"><div style="text-align:center">'+mx([[2,3]],{big:1})+'<p class="muted small">baris</p></div>'+
+      '<div style="font-size:26px;align-self:center;font-weight:800">&times;</div>'+
+      '<div style="text-align:center">'+mx([[4],[5]],{big:1})+'<p class="muted small">kolom</p></div>'+
+      '<div style="font-size:26px;align-self:center;font-weight:800">=</div>'+
+      '<div class="winfo" style="flex:1;min-width:240px" id="wdot-info"><b>Tekan tombol di bawah</b><br>Kalikan pasangan seletak lalu jumlahkan.</div></div>'+
+      '<div class="qbtns"><button class="btn" id="wdot-go">Hitung langkah demi langkah</button></div></div>';
+    var msgs=[
+      'Langkah 1: kalikan elemen pertama &rarr; 2 &times; 4 = <b>8</b>',
+      'Langkah 2: kalikan elemen kedua &rarr; 3 &times; 5 = <b>15</b>',
+      'Langkah 3: jumlahkan &rarr; 8 + 15 = <b>23</b>. Jadi baris &times; kolom = <b>23</b> (satu angka!).'
+    ];
+    var s=0;
+    el.querySelector('#wdot-go').addEventListener('click',function(){
+      var info=el.querySelector('#wdot-info');
+      info.innerHTML=(s>0?info.innerHTML+'<br>':'')+msgs[s];
+      s++;
+      if(s>=msgs.length){el.querySelector('#wdot-go').disabled=true;info.innerHTML+='<br><b style="color:var(--ok)">Inilah inti perkalian dua matriks &mdash; sampai jumpa di pertemuan berikutnya!</b>';}
+    });
+  }
+  render();
+};
+/* ================= KONTEN MATERI 1-5 ================= */
+var M={};
+
+M.m1={num:1,title:'Definisi, Penamaan &amp; Cara Menulis Matriks',ac:'#D64545',
+body:`
+<p class="lead">Kita mulai dari akarnya dulu: sebenarnya <b>apa itu matriks?</b> Coba perhatikan tabel jadwal pelajaran atau denah kursi di kelasmu &mdash; datanya tersusun rapi dalam baris mendatar dan kolom tegak. Susunan seperti itulah yang nantinya kita sebut matriks.</p>
+<div class="card concept"><h3>Definisi Matriks</h3>
+<p>Matriks adalah <b>susunan bilangan berbentuk persegi panjang</b> yang diatur dalam <b>baris</b> (mendatar) dan <b>kolom</b> (tegak), kemudian <b>diapit tanda kurung</b> <span class="k">( )</span> atau <span class="k">[ ]</span>.</p>
+<p style="text-align:center">${mx([[2,-1,0],[4,3,7]],{big:1})}</p>
+<p class="muted" style="text-align:center">Susunan di atas punya 2 baris dan 3 kolom &mdash; diapit kurung, jadi itulah sebuah matriks.</p>
+</div>
+<div class="grid2">
+<div class="card"><h3>Penamaan Matriks</h3>
+<p>Matriks dinamai dengan <b>huruf kapital</b>: A, B, C, P, Q, dan seterusnya. Anggota-anggotanya disebut <b>elemen</b> dan ditulis dengan huruf kecil berindeks posisi: <b>a<sub>ij</sub></b> &mdash; indeks pertama (i) menunjuk <b>baris</b>, indeks kedua (j) menunjuk <b>kolom</b>.</p>
+<p style="text-align:center">${mx([[3,8],[1,6]])} dinamai A</p>
+</div>
+<div class="card"><h3>Cara Menulis Matriks</h3>
+<ol class="steps">
+<li>Susun data ke dalam <b>baris dan kolom yang rapi</b> (sejajar seperti tabel).</li>
+<li>Apit seluruh susunan dengan <b>satu pasang kurung</b> ( ) atau [ ].</li>
+<li>Beri nama huruf <b>kapital</b>, misalnya A = ... .</li>
+</ol></div>
+</div>
+<div class="widget" data-w="definisi"></div>
+<div class="note awas"><b>Awas jebakan!</b> Kurung kurawal { } <u>tidak boleh</u> dipakai untuk matriks &mdash; itu tanda himpunan. Satu garis tegak | | juga bukan matriks (itu notasi nilai mutlak/determinan). Dan ingat: susunan angka tanpa kurung apa pun hanyalah tabel, bukan matriks.</div>
+<div class="note tahu"><b>Matriks di sekitarmu</b> &mdash; coba dekati kembali contoh-contoh ini setelah kalian bisa menulis matriks sendiri:</div>
+<div class="chips"><span class="chip">Jadwal pelajaran</span><span class="chip">Denah kursi kelas</span><span class="chip">Daftar harga jajanan</span><span class="chip">Papan skor game</span><span class="chip">Data penjualan toko</span><span class="chip">Filter foto di HP</span></div>`,
+contoh:[
+ {id:'c1a',q:'<b>Contoh 1.</b> Buatlah matriks J dari jadwal berikut: hari <b>Senin</b> pelajaran ke-1 Matematika dan ke-2 Fisika; hari <b>Selasa</b> ke-1 Biologi dan ke-2 Kimia.',steps:['Tentukan aturan susunan: <b>baris = hari</b> (Senin, Selasa), <b>kolom = jam ke-</b> (1, 2).','Tuliskan datanya mengikuti aturan itu: baris Senin berisi Matematika dan Fisika; baris Selasa berisi Biologi dan Kimia.','Apit dengan kurung lalu beri nama huruf kapital J.'],ans:'J = '+mx([['Matematika','Fisika'],['Biologi','Kimia']],{big:1})+' &nbsp; dengan ordo 2 &times; 2.'},
+ {id:'c1b',q:'<b>Contoh 2.</b> Diketahui matriks A = '+mx([[3,-1,2],[5,0,7]])+'. Tuliskan semua elemen baris kedua, lalu tentukan nilai a<sub>13</sub>.',steps:['Baris kedua = susunan mendatar kedua (dibaca dari kiri): 5, 0, 7.','a<sub>13</sub> artinya elemen baris ke-1 kolom ke-3 (indeks baris selalu ditulis lebih dulu).','Baris pertama A adalah 3, &minus;1, 2; elemen kolom ke-3 dari baris itu adalah 2.'],ans:'Elemen baris kedua: <b>5, 0, 7</b> &nbsp;dan&nbsp; a<sub>13</sub> = <b>2</b>.'}
+]};
+
+M.m2={num:2,title:'Komponen Matriks: Elemen, Ordo &amp; Diagonal',ac:'#E8871E',
+body:`
+<p class="lead">Setiap matriks punya "anatomi" yang selalu sama. Kalau kalian hafal tiga kata ini &mdash; <b>elemen, ordo, dan diagonal</b> &mdash; semua materi berikutnya akan terasa jauh lebih ringan.</p>
+<div class="grid2">
+<div class="card"><h3>Elemen &amp; Indeks</h3>
+<p>Isi matriks disebut <b>elemen</b>. Posisinya ditandai indeks ganda <b>a<sub>ij</sub></b>:<br>
+<b>a<sub>ij</sub></b> = elemen pada <b>baris ke-i</b>, <b>kolom ke-j</b>.<br>
+Contoh: pada matriks ${mx([[8,-3],[5,2]])}, nilai a<sub>12</sub> = &minus;3 karena &minus;3 ada di baris ke-1, kolom ke-2.</p></div>
+<div class="card"><h3>Ordo</h3>
+<p><b>Ordo</b> = ukuran matriks, ditulis <b>m &times; n</b> dibaca "m kali n":<br>
+m = banyak <b>baris</b> (mendatar), n = banyak <b>kolom</b> (tegak).<br>
+Matriks dengan 3 baris dan 2 kolom berordo <b>3 &times; 2</b> dan punya 3 &times; 2 = 6 elemen. <b>Urutannya selalu baris dulu, kolom belakang!</b></p></div>
+</div>
+<div class="card concept"><h3>Diagonal Utama</h3>
+<p>Diagonal utama <b>hanya dimiliki matriks persegi</b> (baris = kolom), yaitu deretan elemen <b>a<sub>11</sub>, a<sub>22</sub>, a<sub>33</sub>, ...</b> dari kiri-atas ke kanan-bawah. Pada ${mx([[6,0,2],[0,-1,5],[4,0,9]])} diagonal utamanya adalah <b>6, &minus;1, 9</b> &mdash; sisanya disebut elemen non-diagonal.</p></div>
+<div class="widget" data-w="komponen"></div>
+<div class="note awas"><b>Awas jebakan!</b> a<sub>23</sub> dibaca <b>"baris ke-2 kolom ke-3"</b>, bukan kolom 2 baris 3. Indeks baris SELALU di depan. Kesalahan klasik lain: menulis ordo 2 &times; 3 untuk matriks yang sebenarnya 3 &times; 2 &mdash; hitung dulu barisnya, baru kolomnya.</div>`,
+contoh:[
+ {id:'c2a',q:'<b>Contoh 1.</b> Tentukan ordo matriks P = '+mx([[4,-2],[0,5],[1,3]])+'.',steps:['Hitung banyak baris (susunan mendatar): ada 3 baris.','Hitung banyak kolom (susunan tegak): ada 2 kolom.','Tulis ordo: baris dulu, kolom belakang.'],ans:'Ordo P adalah <b>3 &times; 2</b>, dengan total 3 &times; 2 = 6 elemen.'},
+ {id:'c2b',q:'<b>Contoh 2.</b> Diketahui A = '+mx([[8,-3,1],[5,2,9],[0,4,7]])+'. Tentukan a<sub>23</sub> dan tuliskan semua elemen diagonal utamanya.',steps:['a<sub>23</sub> = baris ke-2, kolom ke-3. Baris ke-2 berisi 5, 2, 9; kolom ke-3 dari baris itu adalah 9.','Diagonal utama = elemen dengan indeks kembar: a<sub>11</sub>, a<sub>22</sub>, a<sub>33</sub>.','Ambil nilainya: a<sub>11</sub> = 8, a<sub>22</sub> = 2, a<sub>33</sub> = 7.'],ans:'a<sub>23</sub> = <b>9</b>; diagonal utama A: <b>8, 2, 7</b>.'}
+]};
+
+M.m3={num:3,title:'Baris dan Kolom pada Matriks',ac:'#A87900',
+body:`
+<p class="lead">Baris dan kolom adalah dua "jalan" untuk membaca matriks. Membedakan keduanya dengan cepat akan sangat membantu saat kalian menghitung elemen a<sub>ij</sub> dan mengerjakan operasi matriks.</p>
+<div class="grid2">
+<div class="card"><h3>Baris (mendatar)</h3>
+<p><b>Baris ke-i</b> adalah susunan <b>horizontal</b> ke-i, dibaca dari kiri ke kanan. Matriks ${mx([[3,-1,4],[2,5,-6],[7,0,2]])} punya baris ke-1 = (3, &minus;1, 4), baris ke-2 = (2, 5, &minus;6), baris ke-3 = (7, 0, 2).</p></div>
+<div class="card"><h3>Kolom (tegak)</h3>
+<p><b>Kolom ke-j</b> adalah susunan <b>vertikal</b> ke-j, dibaca dari atas ke bawah. Pada matriks yang sama, kolom ke-2 berisi (&minus;1, 5, 0) &mdash; ambil elemen ke-2 dari setiap baris.</p></div>
+</div>
+<div class="card concept"><h3>Menghubungkan Baris-Kolom dengan a<sub>ij</sub></h3>
+<p>Untuk mencari a<sub>ij</sub>: masuk lewat <b>baris ke-i</b> (turun dari atas), lalu berjalan ke <b>kolom ke-j</b> (menyamping). Persimpangannya itulah elemen yang dicari. Sebaliknya, untuk menemukan posisi sebuah angka: hitung dia baris ke-berapa dari atas, lalu kolom ke-berapa dari kiri.</p></div>
+<div class="widget" data-w="bariskolom"></div>
+<div class="note tahu"><b>Trik cepat menghitung banyak elemen:</b> matriks berordo m &times; n selalu punya m &times; n elemen. Setiap baris berisi n elemen (sebanyak kolom), dan setiap kolom berisi m elemen (sebanyak baris).</div>`,
+contoh:[
+ {id:'c3a',q:'<b>Contoh 1.</b> Dari matriks B = '+mx([[3,1],[-2,5],[0,4]])+', tuliskan kolom kedua dalam bentuk matriks.',steps:['Kolom kedua = elemen ke-2 dari setiap baris, dibaca dari atas ke bawah.','Baris 1 menyumbang 1, baris 2 menyumbang 5, baris 3 menyumbang 4.','Susun tegak lalu apit dengan kurung.'],ans:'Kolom kedua B = '+mx([[1],[5],[4]],{big:1})+' &nbsp;(matriks kolom berordo 3 &times; 1).'},
+ {id:'c3b',q:'<b>Contoh 2.</b> Pada A = '+mx([[2,5,1],[7,6,3]])+', di baris dan kolom ke berapa angka 6 berada?',steps:['Temukan angka 6: ia ada pada susunan mendatar kedua &rarr; baris ke-2.','Dari kiri, 6 adalah elemen kedua &rarr; kolom ke-2.','Gabungkan posisinya dalam notasi indeks.'],ans:'Angka 6 berada di <b>baris ke-2, kolom ke-2</b>, jadi 6 = a<sub>22</sub>.'}
+]};
+
+M.m4={num:4,title:'Jenis-Jenis Matriks: Menurut Ordo',ac:'#2A9D8F',
+body:`
+<p class="lead">Matriks bisa dikelompokkan menurut <b>bentuk (ordo)</b>-nya. Empat jenis pertama ini kalian akan temui terus-menerus, jadi kenali "wajah"-nya dengan baik.</p>
+<div class="grid2">
+<div class="card"><h3>Matriks Baris &mdash; 1 &times; n</h3>
+<p>${mx([[2,5,9]])} &nbsp;Hanya satu baris. Ordonya selalu 1 &times; n, di mana n = banyak kolomnya. Contoh di samping berordo 1 &times; 3.</p></div>
+<div class="card"><h3>Matriks Kolom &mdash; m &times; 1</h3>
+<p>${mx([[4],[-1],[7]])} &nbsp;Hanya satu kolom, susunannya tegak. Contoh di samping berordo 3 &times; 1.</p></div>
+<div class="card"><h3>Matriks Persegi &mdash; m = n</h3>
+<p>${mx([[3,8],[1,6]])} &nbsp;Banyak baris = banyak kolom (2 &times; 2, 3 &times; 3, dst). Hanya matriks persegi yang punya diagonal utama &mdash; ingat Materi 2!</p></div>
+<div class="card"><h3>Matriks Persegi Panjang &mdash; m &ne; n</h3>
+<p>${mx([[5,2,0],[3,7,1]])} &nbsp;Baris dan kolomnya berbeda. Contoh di samping berordo 2 &times; 3 &mdash; persegi panjang, bukan persegi.</p></div>
+</div>
+<div class="widget" data-w="jenisOrdo"></div>
+<div class="note awas"><b>Awas jebakan!</b> Matriks 1 &times; 1 seperti ${mx([[7]])} dianggap <b>matriks persegi</b> (baris = kolom = 1). Dan hati-hati: [[2,3]] (ordo 1 &times; 2) dengan ${mx([[2],[3]])} (ordo 2 &times; 1) adalah dua matriks yang <u>berbeda</u> meskipun angkanya sama!</div>`,
+contoh:[
+ {id:'c4a',q:'<b>Contoh 1.</b> Klasifikasikan menurut ordo: P = '+mx([[1,2],[3,4],[5,6]])+', Q = '+mx([[8]])+', R = '+mx([[4,0,2]])+'.',steps:['P: hitung baris dan kolom &rarr; 3 baris, 2 kolom. Karena 3 &ne; 2, P matriks persegi panjang.','Q: 1 baris 1 kolom &rarr; ordo 1 &times; 1. Baris = kolom, jadi Q matriks persegi.','R: 1 baris 3 kolom &rarr; ordo 1 &times; 3, hanya satu baris &rarr; R matriks baris.'],ans:'P = matriks <b>persegi panjang</b> (3&times;2), Q = matriks <b>persegi</b> (1&times;1), R = matriks <b>baris</b> (1&times;3).'},
+ {id:'c4b',q:'<b>Contoh 2.</b> Sebuah matriks punya 4 elemen yang tersusun dalam 2 kolom. Berapa ordo dan jenisnya?',steps:['Banyak elemen = baris &times; kolom &rarr; 4 = m &times; 2.','Maka m = 4 &divide; 2 = 2 baris.','Bandingkan baris dan kolom untuk menentukan jenisnya.'],ans:'Ordonya <b>2 &times; 2</b>. Karena baris = kolom, matriks itu termasuk <b>matriks persegi</b>.'}
+]};
+
+M.m4b={num:'4',title:'Jenis-Jenis Matriks: Menurut Sifat &amp; Elemen',ac:'#2A9D8F',
+body:`
+<p class="lead">Selain menurut ordo, matriks juga dikelompokkan menurut <b>sifat elemen-elemennya</b>. Tujuh jenis di bawah ini adalah daftar lengkapnya untuk jenismu kelas XI &mdash; perhatikan pola angka nol dan diagonalnya.</p>
+<div class="card concept"><h3>Rangkuman Ciri-Ciri</h3>
+<ul class="tight">
+<li><b>Matriks nol (O)</b> &mdash; semua elemen 0, contoh ${mx([[0,0],[0,0]])}.</li>
+<li><b>Matriks diagonal</b> &mdash; persegi; non-diagonal semua 0, diagonal bebas: ${mx([[6,0],[0,-2]])}.</li>
+<li><b>Matriks skalar</b> &mdash; diagonal dengan nilai diagonal sama: ${mx([[4,0],[0,4]])}.</li>
+<li><b>Matriks identitas (I)</b> &mdash; skalar dengan diagonal 1: ${mx([[1,0],[0,1]])}.</li>
+<li><b>Segitiga atas</b> &mdash; persegi; elemen <u>di bawah</u> diagonal = 0: ${mx([[2,5],[0,3]])}.</li>
+<li><b>Segitiga bawah</b> &mdash; persegi; elemen <u>di atas</u> diagonal = 0: ${mx([[2,0],[5,3]])}.</li>
+<li><b>Matriks simetri</b> &mdash; persegi dengan A = A<sup>T</sup>; elemen bercermin sama: ${mx([[1,4],[4,2]])}.</li>
+</ul></div>
+<div class="widget" data-w="jenisSifat"></div>
+<div class="note awas"><b>Awas jebakan!</b> Identitas PASTI skalar dan PASTI diagonal, tetapi tidak sebaliknya &mdash; ${mx([[4,0],[0,4]])} skalar saja, bukan identitas. Matriks segitiga boleh punya angka 0 di diagonalnya; yang wajib nol hanyalah sisi bawah (atas) diagonalnya. Dan satu matriks bisa punya beberapa "gelar" sekaligus: ${mx([[3,0],[0,3]])} adalah skalar, diagonal, sekaligus simetri.</div>`,
+contoh:[
+ {id:'c4c',q:'<b>Contoh 1.</b> Tunjukkan bahwa A = '+mx([[3,1],[1,4]])+' adalah matriks simetri.',steps:['Matriks simetri mensyaratkan A = A<sup>T</sup> (transpose akan dipelajari di Materi 10: baris dan kolom saling bertukar).','Tulis A<sup>T</sup> dengan menukar baris menjadi kolom: A<sup>T</sup> = '+mx([[3,1],[1,4]])+'.','Bandingkan: A dan A<sup>T</sup> identik. Cek cepat: a<sub>12</sub> = a<sub>21</sub> = 1.'],ans:'Karena A<sup>T</sup> = A, matriks A <b>simetri</b>. Untuk matriks 2&times;2 cukup cek a<sub>12</sub> = a<sub>21</sub>.'},
+ {id:'c4d',q:'<b>Contoh 2.</b> Dari B = '+mx([[0,2,5],[0,3,7],[0,0,4]])+', sebutkan jenis matriks B menurut sifatnya.',steps:['Cek nol di bawah diagonal: a<sub>21</sub> = 0, a<sub>31</sub> = 0, a<sub>32</sub> = 0. Semua elemen di bawah diagonal utama nol.','Berarti B segitiga atas. B persegi (3 &times; 3) &mdash; syaratnya terpenuhi.','Cek lain: diagonal B = 0, 3, 4 (tidak sama) &rarr; bukan skalar/identitas; ada elemen tak nol &rarr; bukan matriks nol.'],ans:'B adalah <b>matriks segitiga atas</b> (sekaligus matriks persegi 3&times;3).'}
+]};
+
+M.m5={num:5,title:'Kesamaan Dua Matriks',ac:'#7C5CBF',
+body:`
+<p class="lead">Kapan dua matriks boleh dibilang "sama"? Konsep ini terlihat sepele, tetapi justru inilah alat utama untuk mencari nilai variabel yang tersembunyi di dalam matriks &mdash; soal favorit ujian!</p>
+<div class="card concept"><h3>Dua Syarat Wajib</h3>
+<p>A = B jika dan hanya jika:</p>
+<ol class="steps">
+<li><b>Ordonya sama</b> (misal keduanya 2 &times; 3);</li>
+<li><b>Semua elemen seletak bernilai sama</b>: a<sub>ij</sub> = b<sub>ij</sub> untuk setiap posisi.</li>
+</ol>
+<p style="text-align:center">${mx([[2,5],[1,4]],{big:1})} = ${mx([[2,5],[1,4]],{big:1})} &nbsp;&check; &nbsp;sedangkan&nbsp; ${mx([[2,5]],{big:1})} &ne; ${mx([[2],[5]],{big:1})} &nbsp;&times; (ordo berbeda)</p></div>
+<div class="card"><h3>Kekuatan Konsep Ini: Mencari Variabel</h3>
+<p>Jika ${mx([['x',3],[2,'y']])} = ${mx([[7,3],[2,-4]])}, maka otomatis x = 7 dan y = &minus;4. Satu kesamaan matriks bisa memuat beberapa persamaan sekaligus &mdash; persis seperti bermain "cocokkan pasangan" di setiap posisi.</p></div>
+<div class="widget" data-w="kesamaan"></div>
+<div class="note awas"><b>Awas jebakan!</b> Ordo berbeda = pasti tidak sama, sekalipun jumlah elemennya sama atau angkanya mirip. [[1,2,3]] tidak akan pernah sama dengan ${mx([[1],[2],[3]])} karena ordonya 1 &times; 3 melawan 3 &times; 1.</div>`,
+contoh:[
+ {id:'c5a',q:'<b>Contoh 1.</b> Tentukan nilai x dan y dari '+mx([['x',3],[2,'y']],{big:1})+' = '+mx([[5,3],[2,-4]],{big:1})+'.',steps:['Cek ordo: keduanya 2 &times; 2 &mdash; syarat pertama terpenuhi.','Cocokkan elemen seletak: a<sub>11</sub> = b<sub>11</sub> memberi x = 5.','Cocokkan posisi a<sub>22</sub> = b<sub>22</sub> memberi y = &minus;4. Posisi lain sudah sama (3 = 3, 2 = 2).'],ans:'<b>x = 5</b> dan <b>y = &minus;4</b>.'},
+ {id:'c5b',q:'<b>Contoh 2.</b> Jika '+mx([['2x','y+1']],{big:1})+' = '+mx([[10,6]],{big:1})+', tentukan nilai x dan y.',steps:['Kedua matriks sama-sama berordo 1 &times; 2 &rarr; boleh disamakan.','Elemen pertama: 2x = 10, sehingga x = 10 &divide; 2 = 5.','Elemen kedua: y + 1 = 6, sehingga y = 6 &minus; 1 = 5.'],ans:'<b>x = 5</b> dan <b>y = 5</b>.'}
+]};
+/* ================= KONTEN MATERI 6-10 ================= */
+
+M.m6={num:6,title:'Penjumlahan Matriks',ac:'#2D7DD2',
+body:`
+<p class="lead">Sekarang matriks mulai "dihitung". Penjumlahan adalah operasi paling ramah: syaratnya satu, dan caranya persis seperti mencocokkan pasangan. Bayangkan menggabungkan data penjualan dua toko &mdash; itulah wajah nyata penjumlahan matriks.</p>
+<div class="card concept"><h3>Definisi &amp; Syarat</h3>
+<p>A + B terdefinisi <b>hanya jika A dan B berordo sama</b>. Hasilnya diperoleh dengan <b>menjumlahkan elemen-elemen yang seletak</b>:</p>
+<p style="text-align:center">${mx([['a','b'],['c','d']],{big:1})} + ${mx([['e','f'],['g','h']],{big:1})} = ${mx([['a+e','b+f'],['c+g','d+h']],{big:1})}</p>
+<p class="muted" style="text-align:center">Elemen baru = jumlah dua elemen di posisi yang sama.</p></div>
+<div class="widget" data-w="jumlah"></div>
+<div class="card"><h3>Sifat-Sifat Penjumlahan</h3>
+<ul class="tight">
+<li><b>Komutatif</b>: A + B = B + A (urutan bebas).</li>
+<li><b>Asosiatif</b>: (A + B) + C = A + (B + C) (pengelompokan bebas).</li>
+<li><b>Unsur pengenal (identitas)</b>: A + O = A, dengan O matriks nol seordo.</li>
+<li><b>Lawan jumlah</b>: A + (&minus;A) = O.</li>
+</ul></div>
+<div class="note awas"><b>Awas jebakan!</b> Jika ordonya berbeda &mdash; misalnya 2 &times; 2 dijumlah 2 &times; 3 &mdash; hasilnya <u>tidak terdefinisi</u>. Jangan pernah memaksakan menjumlahkan elemen "yang muat".</div>`,
+contoh:[
+ {id:'c6a',q:'<b>Contoh 1.</b> Diketahui A = '+mx([[2,-1],[3,4]])+' dan B = '+mx([[5,0],[-2,1]])+'. Tentukan A + B.',steps:['Cek ordo: A dan B sama-sama 2 &times; 2 &rarr; penjumlahan terdefinisi.','Jumlahkan seletak: a<sub>11</sub>: 2+5=7; a<sub>12</sub>: &minus;1+0=&minus;1.','Lanjut baris kedua: a<sub>21</sub>: 3+(&minus;2)=1; a<sub>22</sub>: 4+1=5.'],ans:'A + B = '+mx([[7,-1],[1,5]],{big:1})},
+ {id:'c6b',q:'<b>Contoh 2.</b> Penjualan kantin (baris: roti, susu; kolom: kelas X-A, X-B) hari Senin '+mx([[12,8],[5,10]])+' dan hari Selasa '+mx([[9,11],[7,6]])+'. Tentukan total penjualan dua hari pada posisi roti-kelas X-A.',steps:['Total dua hari = jumlahkan matriks Senin dan Selasa (ordo sama, 2 &times; 2).','Posisi roti&ndash;X-A adalah elemen a<sub>11</sub> di kedua matriks: 12 dan 9.','Jumlahkan: 12 + 9 = 21.'],ans:'Total roti untuk kelas X-A = <b>21</b>. (Matriks totalnya: '+mx([[21,19],[12,16]])+')'}
+]};
+
+M.m7={num:7,title:'Pengurangan Matriks',ac:'#C2478F',
+body:`
+<p class="lead">Pengurangan matriks adalah "kembaran gelap" penjumlahan: syaratnya sama, tetapi urutannya berpengaruh besar. Konsep ini sering muncul di soal cerita &mdash; misalnya mencari sisa stok setelah terjual.</p>
+<div class="card concept"><h3>Definisi</h3>
+<p>A &minus; B terdefinisi jika <b>ordo A = ordo B</b>. Hasilnya: <b>kurangkan elemen seletak</b>. Bisa juga ditulis A &minus; B = A + (&minus;B), di mana &minus;B adalah matriks B dengan semua tanda dibalik.</p>
+<p style="text-align:center">${mx([[7,2],[-3,5]],{big:1})} &minus; ${mx([[4,6],[1,-2]],{big:1})} = ${mx([[3,-4],[-4,7]],{big:1})}</p>
+<p class="muted" style="text-align:center">Hati-hati dengan tanda: 2 &minus; 6 = &minus;4 dan &minus;3 &minus; 1 = &minus;4.</p></div>
+<div class="widget" data-w="kurang"></div>
+<div class="card"><h3>Yang Perlu Diingat</h3>
+<ul class="tight">
+<li>Pengurangan <b>TIDAK komutatif</b>: A &minus; B &ne; B &minus; A (umumnya).</li>
+<li>Tetap berlaku hubungan: A &minus; B = &minus;(B &minus; A) &mdash; hasilnya saling berlawanan tanda.</li>
+<li>A &minus; A = O (matriks nol seordo).</li>
+<li>Pindah ruas tetap sah: jika A &minus; B = C maka B = A &minus; C.</li>
+</ul></div>
+<div class="note awas"><b>Awas jebakan!</b> Kesalahan terbanyak ada di pengurangan bilangan negatif: 4 &minus; (&minus;4) = 4 + 4 = 8, bukan 0. Selalu ubah "minus bertemu minus" menjadi penjumlahan.</div>`,
+contoh:[
+ {id:'c7a',q:'<b>Contoh 1.</b> Diketahui A = '+mx([[7,2],[-3,5]])+' dan B = '+mx([[4,6],[1,-2]])+'. Tentukan A &minus; B.',steps:['Ordo sama (2 &times; 2) &rarr; terdefinisi.','Kurangkan seletak: 7&minus;4=3; 2&minus;6=&minus;4.','&minus;3&minus;1=&minus;4; 5&minus;(&minus;2)=5+2=7. Perhatikan perubahan tanda!'],ans:'A &minus; B = '+mx([[3,-4],[-4,7]],{big:1})},
+ {id:'c7b',q:'<b>Contoh 2.</b> Stok awal kantin '+mx([[30,25],[20,15]])+' (baris: gorengan, minuman; kolom: pagi, siang). Setelah terjual '+mx([[12,9],[8,11]])+', berapa sisa gorengan pada waktu siang?',steps:['Sisa = stok awal &minus; terjual (ordo sama, 2 &times; 2).','Posisi gorengan&ndash;siang = elemen a<sub>12</sub>: 25 dan 9.','Hitung: 25 &minus; 9 = 16.'],ans:'Sisa gorengan waktu siang = <b>16</b>. (Matriks sisa: '+mx([[18,16],[12,4]])+')'}
+]};
+
+M.m8={num:8,title:'Perkalian Matriks dengan Skalar',ac:'#4C9F70',
+body:`
+<p class="lead">"Skalar" hanyalah sebutan untuk bilangan biasa (2, &minus;3, 1/2, 0,5...). Mengalikan matriks dengan skalar sangat sederhana: <b>setiap</b> elemen dikalikan. Tidak ada syarat ordo di sini &mdash; bentuk matriks tidak berubah.</p>
+<div class="card concept"><h3>Definisi</h3>
+<p>kA = mengalikan <b>setiap elemen</b> A dengan skalar k.</p>
+<p style="text-align:center">3 &times; ${mx([[1,-2],[4,0]],{big:1})} = ${mx([[3,-6],[12,0]],{big:1})}</p>
+<p class="muted" style="text-align:center">Bandingkan dengan penjumlahan: tidak ada "seletak" &mdash; semua elemen kena.</p></div>
+<div class="widget" data-w="skalar"></div>
+<div class="card"><h3>Sifat-Sifat Penting</h3>
+<ul class="tight">
+<li><b>Distributif terhadap penjumlahan matriks</b>: k(A + B) = kA + kB.</li>
+<li><b>Distributif terhadap penjumlahan skalar</b>: (k + l)A = kA + lA.</li>
+<li><b>Asosiatif skalar</b>: (kl)A = k(lA).</li>
+<li>k = &minus;1 memberi <b>&minus;A</b> (lawan jumlah); k = 0 memberi <b>O</b>.</li>
+</ul></div>
+<div class="note tahu"><b>Di dunia nyata:</b> kalikan matriks harga dengan 2 saat semua harga naik dua kali lipat, atau dengan 1/2 untuk membagi rata tagihan &mdash; skalar memang "kenop" pengganda untuk seluruh data sekaligus.</div>`,
+contoh:[
+ {id:'c8a',q:'<b>Contoh 1.</b> Jika A = '+mx([[2,-1],[0,4]])+', tentukan 3A.',steps:['Kalikan setiap elemen dengan 3: 3&times;2=6; 3&times;(&minus;1)=&minus;3.','3&times;0=0; 3&times;4=12.','Susun kembali menjadi matriks.'],ans:'3A = '+mx([[6,-3],[0,12]],{big:1})},
+ {id:'c8b',q:'<b>Contoh 2.</b> Jika A = '+mx([[1,5],[-2,3]])+' dan B = '+mx([[4,-1],[0,2]])+', hitung 2A &minus; 3B.',steps:['Hitung 2A: '+mx([[2,10],[-4,6]])+'.','Hitung 3B: '+mx([[12,-3],[0,6]])+'.','Kurangkan seletak: 2&minus;12=&minus;10; 10&minus;(&minus;3)=13; &minus;4&minus;0=&minus;4; 6&minus;6=0.'],ans:'2A &minus; 3B = '+mx([[-10,13],[-4,0]],{big:1})}
+]};
+
+M.m9={num:9,title:'Pembagian Matriks',ac:'#B85C38',
+body:`
+<p class="lead">Materi ini singkat tetapi sering mengecoh: <b>matriks tidak memiliki operasi pembagian langsung</b>. Tidak ada simbol A &divide; B antar dua matriks! Yang ada hanyalah pembagian matriks oleh <b>skalar tak nol</b> &mdash; dan itu sebenarnya perkalian pecahan.</p>
+<div class="card concept"><h3>Yang Boleh: Matriks : Skalar</h3>
+<p>Untuk skalar k &ne; 0:</p>
+<p style="text-align:center">A : k = <span class="frac"><span>1</span><span>k</span></span> &times; A &nbsp;&nbsp;(setiap elemen dibagi k)</p>
+<p style="text-align:center">${mx([[10,-15],[20,5]],{big:1})} : 5 = ${mx([[2,-3],[4,1]],{big:1})}</p>
+<p>Jika hasilnya tidak bulat, tulis sebagai pecahan: 3 : 4 = <span class="frac"><span>3</span><span>4</span></span>.</p></div>
+<div class="widget" data-w="bagi"></div>
+<div class="card"><h3>Yang Tidak Boleh &mdash; dan Penggantinya</h3>
+<ul class="tight">
+<li>A : B (matriks dibagi matriks) <b>tidak terdefinisi</b>.</li>
+<li>Penggantinya: A &times; B<sup>&minus;1</sup> &mdash; perkalian dengan <b>matriks invers</b> (konsep lanjutan setelah bab ini, mirip "kebalikan" bilangan).</li>
+<li>Pembagian dengan skalar <b>nol tidak boleh</b>, sama seperti pada bilangan biasa.</li>
+<li>Tetap berlaku distributif: (A + B) : k = A : k + B : k, untuk k &ne; 0.</li>
+</ul></div>
+<div class="note awas"><b>Awas jebakan!</b> Soal "A : B = ..." di ujian hampir pasti menjebak kalian menjawab "hasilnya A &times; B" atau membagi elemen seletak. Jawaban yang benar: <b>tidak terdefinisi</b> (kecuali yang dimaksud adalah perkalian dengan invers).</div>`,
+contoh:[
+ {id:'c9a',q:'<b>Contoh 1.</b> Hitung A : 5 untuk A = '+mx([[10,-15],[20,5]])+'.',steps:['Bagi dengan 5 sama dengan mengalikan dengan 1/5.','Setiap elemen dibagi 5: 10:5=2; &minus;15:5=&minus;3; 20:5=4; 5:5=1.','Susun hasilnya menjadi matriks.'],ans:'A : 5 = '+mx([[2,-3],[4,1]],{big:1})},
+ {id:'c9b',q:'<b>Contoh 2.</b> Jika B : 2 = '+mx([[3,0],[-4,7]])+', tentukan matriks B.',steps:['Dari B : 2 = C, pindah ruas: B = 2 &times; C (kembalikan dengan mengali 2).','Kalikan setiap elemen C dengan 2: 3&times;2=6; 0&times;2=0; &minus;4&times;2=&minus;8; 7&times;2=14.'],ans:'B = '+mx([[6,0],[-8,14]],{big:1})}
+]};
+
+M.m10={num:10,title:'Transpose Matriks',ac:'#5E60CE',
+body:`
+<p class="lead">Operasi terakhir semudah memutar meja: <b>transpose</b> menukar posisi baris dan kolom. Operasi ini yang menghubungkan semuanya &mdash; termasuk membuktikan matriks simetri di Materi 4.</p>
+<div class="card concept"><h3>Definisi</h3>
+<p>Transpose A, ditulis <b>A<sup>T</sup></b> (dibaca "A transpose"), diperoleh dengan menjadikan <b>baris ke-i A sebagai kolom ke-i A<sup>T</sup></b>.</p>
+<p style="text-align:center">${mx([[1,2,3],[4,5,6]],{big:1})} &nbsp;&rarr;&nbsp; ${mx([[1,4],[2,5],[3,6]],{big:1})}</p>
+<p class="muted" style="text-align:center">Ordo ikut bertukar: 2 &times; 3 menjadi 3 &times; 2. Rumus: (A<sup>T</sup>)<sub>ij</sub> = a<sub>ji</sub>.</p></div>
+<div class="widget" data-w="transpos"></div>
+<div class="card"><h3>Sifat-Sifat Transpose</h3>
+<ul class="tight">
+<li><b>Involutif</b>: (A<sup>T</sup>)<sup>T</sup> = A &mdash; transpose dua kali kembali ke semula.</li>
+<li><b>Ordo bertukar</b>: A berordo m &times; n &rarr; A<sup>T</sup> berordo n &times; m.</li>
+<li><b>Distributif</b>: (A + B)<sup>T</sup> = A<sup>T</sup> + B<sup>T</sup> dan (kA)<sup>T</sup> = kA<sup>T</sup>.</li>
+<li>A simetri &hArr; A<sup>T</sup> = A (syarat: persegi dan elemen bercermin sama).</li>
+</ul></div>
+<div class="note awas"><b>Awas jebakan!</b> Transpose BUKAN membalik urutan angka dalam satu baris, dan bukan membalik tanda. Elemen diagonal utama matriks persegi tetap di tempatnya &mdash; yang berpindah hanya elemen di atas/bawah diagonal.</div>`,
+contoh:[
+ {id:'c10a',q:'<b>Contoh 1.</b> Tentukan A<sup>T</sup> untuk A = '+mx([[1,2,3],[4,5,6]])+', lalu sebutkan ordonya.',steps:['Tuliskan baris A secara vertikal: baris (1,2,3) menjadi kolom pertama.','Baris (4,5,6) menjadi kolom kedua.','Cek ordo: A berordo 2 &times; 3, jadi A<sup>T</sup> berordo 3 &times; 2.'],ans:'A<sup>T</sup> = '+mx([[1,4],[2,5],[3,6]],{big:1})+' dengan ordo 3 &times; 2.'},
+ {id:'c10b',q:'<b>Contoh 2.</b> Diketahui B = '+mx([[2,-1],[7,0]])+'. Tunjukkan bahwa (B<sup>T</sup>)<sup>T</sup> = B.',steps:['Transpose pertama: baris menjadi kolom, B<sup>T</sup> = '+mx([[2,7],[-1,0]])+'.','Transpose sekali lagi: kolom B<sup>T</sup> menjadi baris.','Hasilnya kembali sama dengan B.'],ans:'(B<sup>T</sup>)<sup>T</sup> = '+mx([[2,-1],[7,0]],{big:1})+' = B &nbsp;&check; (sifat involutif)'}
+]};
+/* ================= BANK SOAL: MATERI 1-5 ================= */
+QUIZ.lat1=[
+{t:'mc',q:'Susunan bilangan berbentuk persegi panjang yang diatur dalam baris dan kolom serta diapit tanda kurung disebut...',o:['Fungsi','Relasi','Matriks','Vektor'],a:2,p:'Itulah definisi matriks: susunan bilangan dalam baris (mendatar) dan kolom (tegak) yang diapit kurung ( ) atau [ ]. Fungsi dan relasi adalah konsep pasangan anggota himpunan, sedangkan vektor biasanya ditulis dengan panah atau garis.'},
+{t:'mc',q:'Pasangan tanda kurung yang sah untuk menulis matriks adalah...',o:['Kurung kurawal { }','Kurung biasa ( ) atau kurung siku [ ]','Satu garis tegak | |','Tanpa kurung, cukup spasi'],a:1,p:'Matriks ditulis diapit ( ) atau [ ]. Kurung kurawal { } adalah notasi himpunan, garis tegak | | untuk nilai mutlak/determinan, dan susunan tanpa kurung hanyalah tabel biasa.'},
+{t:'mc',q:'Matriks lazim dinamai dengan...',o:['Huruf kecil a, b, c','Huruf kapital A, B, C','Angka 1, 2, 3','Simbol bebas seperti #'],a:1,p:'Konvensi penulisan: matriks memakai huruf KAPITAL (A, B, P, ...), sedangkan elemennya ditulis huruf kecil dengan indeks posisi (a<sub>11</sub>, a<sub>12</sub>, ...).'},
+{t:'mc',q:'Manakah penulisan matriks yang BENAR untuk data 1, 2 (baris 1) dan 3, 4 (baris 2)?',o:['{1 2; 3 4} dengan kurung kurawal',mx([[1,2],[3,4]]),'|1 2; 3 4| dengan satu garis tegak','1, 2, 3, 4 ditulis berbaris tanpa kurung'],a:1,p:'Hanya opsi kedua yang diapit sepasang kurung siku secara sah. Kurung kurawal untuk himpunan, garis tegak tunggal bukan notasi matriks, dan deretan angka tanpa kurung hanyalah data.'},
+{t:'mc',q:'Berikut yang paling tepat disebut wujud matriks dalam kehidupan sehari-hari adalah...',o:['Jadwal pelajaran kelas','Judul buku pelajaran','Nama wali kelas','Warna seragam sekolah'],a:0,p:'Jadwal pelajaran tersusun dalam baris (hari) dan kolom (jam ke-) &mdash; persis bentuk matriks. Contoh lain: denah kursi, daftar harga, dan papan skor.'},
+{t:'in',q:'Sebuah matriks terdiri atas 3 baris dan 4 kolom. Berapa banyak elemennya?',a:'12',p:'Banyak elemen = banyak baris &times; banyak kolom = 3 &times; 4 = 12. Ingat: setiap baris berisi 4 elemen, dan ada 3 baris.'},
+{t:'mc',q:'Susunan angka "2&nbsp; 5" yang terletak pada satu garis mendatar di dalam matriks disebut...',o:['Kolom','Baris','Diagonal','Ordo'],a:1,p:'Garis mendatar = baris; garis tegak = kolom. Diagonal hanya ada pada matriks persegi (kiri-atas ke kanan-bawah), dan ordo adalah ukuran matriks m &times; n.'},
+{t:'mc',q:'Pada matriks A = '+mx([[4,-1],[2,6]])+', elemen-elemen baris PERTAMA adalah...',o:['4 dan &minus;1','&minus;1 dan 2','2 dan 6','4 dan 6'],a:0,p:'Baris pertama dibaca mendatar dari kiri: 4 dan &minus;1. (4 dan 6 adalah kolom pertama &mdash; dibaca tegak.)'},
+{t:'in',q:'Diketahui P = '+mx([[8,1],[0,5],[3,2]])+'. Berapakah elemen pada baris ke-3 kolom ke-2?',a:'2',p:'Baris ke-3 P adalah (3, 2). Elemen kolom ke-2 dari baris itu adalah 2.'},
+{t:'mc',q:'Perhatikan pernyataan berikut.<br>(i) Matriks boleh ditulis dengan kurung siku [ ].<br>(ii) Matriks dinamai dengan huruf kecil.<br>(iii) Elemen matriks wajib tersusun dalam baris dan kolom.<br>Pernyataan yang benar adalah...',o:['(i) dan (ii)','(i) dan (iii)','(ii) dan (iii)','semuanya'],a:1,p:'(i) benar &mdash; kurung siku sah. (ii) salah &mdash; matriks dinamai huruf KAPITAL. (iii) benar &mdash; itu inti definisi matriks.'}
+];
+
+QUIZ.lat2=[
+{t:'in',q:'Tentukan ordo matriks '+mx([[3,-1,2],[5,0,7]])+'.<br><span class="muted small">Tulis dengan format barisxkolom, contoh: 2x3</span>',a:'2x3',alt:['2 x 3','2X3'],p:'Ada 2 baris (mendatar) dan 3 kolom (tegak), jadi ordonya 2 &times; 3. Selalu tulis BARIS dulu baru kolom.'},
+{t:'in',q:'Diketahui A = '+mx([[4,9],[1,6],[8,2]])+'. Berapakah nilai a<sub>12</sub>?',a:'9',p:'a<sub>12</sub> = elemen baris ke-1, kolom ke-2. Baris pertama berisi (4, 9); elemen kolom ke-2 adalah 9.'},
+{t:'in',q:'Pada matriks A = '+mx([[4,9],[1,6],[8,2]])+' yang sama, berapakah nilai a<sub>31</sub>?',a:'8',p:'a<sub>31</sub> = baris ke-3, kolom ke-1. Baris ke-3 berisi (8, 2); elemen kolom pertamanya adalah 8.'},
+{t:'mc',q:'Diagonal utama matriks '+mx([[5,2,9],[1,7,4],[8,3,6]])+' adalah...',o:['5, 7, 6','5, 2, 9','9, 4, 6','2, 7, 3'],a:0,p:'Diagonal utama = a<sub>11</sub>, a<sub>22</sub>, a<sub>33</sub> (kiri-atas ke kanan-bawah) = 5, 7, 6. Opsi lain adalah baris pertama, kolom ketiga, dan kolom kedua.'},
+{t:'mc',q:'Syarat sebuah matriks disebut matriks persegi adalah...',o:['Semua elemennya sama','Banyak barisnya sama dengan banyak kolomnya','Punya elemen diagonal','Semua elemennya tidak nol'],a:1,p:'Matriks persegi: m = n, misalnya 2&times;2 atau 3&times;3. Hanya matriks persegi yang memiliki diagonal utama &mdash; itulah mengapa syarat ini penting.'},
+{t:'in',q:'Berapa banyak elemen pada matriks berordo 3 &times; 4?',a:'12',p:'Banyak elemen = m &times; n = 3 &times; 4 = 12.'},
+{t:'mc',q:'Sebuah matriks 2 &times; 2 memiliki a<sub>11</sub> = 2, a<sub>12</sub> = 0, a<sub>21</sub> = &minus;3, a<sub>22</sub> = 5. Matriks tersebut adalah...',o:[mx([[2,0],[-3,5]]),mx([[2,0],[5,-3]]),mx([[0,2],[-3,5]]),mx([[2,-3],[0,5]])],a:0,p:'Susun baris demi baris: baris 1 = (a<sub>11</sub>, a<sub>12</sub>) = (2, 0); baris 2 = (a<sub>21</sub>, a<sub>22</sub>) = (&minus;3, 5). Opsi lain menukar posisi elemen.'},
+{t:'in',q:'Berapakah ordo sebuah matriks kolom yang memiliki 4 elemen?<br><span class="muted small">Format: barisxkolom</span>',a:'4x1',alt:['4 x 1','4X1'],p:'Matriks kolom hanya punya 1 kolom; jika berisi 4 elemen maka ada 4 baris &rarr; ordo 4 &times; 1.'},
+{t:'mc',q:'Jumlah seluruh elemen diagonal utama dari '+mx([[2,1,3],[9,4,6],[5,8,1]])+' adalah...',o:['6','7','10','17'],a:1,p:'Diagonal utamanya 2, 4, 1 (indeks kembar). Jumlahnya 2 + 4 + 1 = 7. Hati-hati dengan 17 (jumlah seluruh elemen) &mdash; itu bukan yang ditanya.'},
+{t:'mc',q:'Notasi a<sub>32</sub> menunjukkan elemen yang terletak pada...',o:['Baris ke-3, kolom ke-2','Baris ke-2, kolom ke-3','Baris ke-3, kolom ke-3','Diagonal utama'],a:0,p:'Dalam a<sub>ij</sub>, indeks pertama selalu BARIS. Jadi a<sub>32</sub> = baris ke-3, kolom ke-2. Membaliknya adalah kesalahan yang paling sering muncul di ulangan!'}
+];
+
+QUIZ.lat3=[
+{t:'mc',q:'Perhatikan matriks A = '+mx([[3,-1,4,0],[2,5,-6,1],[7,0,2,8]])+'.<br>A memiliki banyak baris dan kolom berturut-turut...',o:['3 baris dan 4 kolom','4 baris dan 3 kolom','12 baris dan 1 kolom','3 baris dan 3 kolom'],a:0,p:'Susunan mendatar ada 3 (baris), susunan tegak ada 4 (kolom). Ingat: baris dulu, kolom belakang &rarr; ordo 3 &times; 4.'},
+{t:'mc',q:'Pada matriks A = '+mx([[3,-1,4,0],[2,5,-6,1],[7,0,2,8]])+', baris ke-2 adalah...',o:[mx([[2,5,-6,1]]),mx([[3,-1,4,0]]),mx([[-1,5,0]]),mx([[2],[7]])],a:0,p:'Baris ke-2 dibaca mendatar dari kiri: 2, 5, &minus;6, 1. Opsi terakhir malah merupakan kolom pertama.'},
+{t:'mc',q:'Pada matriks A = '+mx([[3,-1,4,0],[2,5,-6,1],[7,0,2,8]])+', kolom ke-3 berisi elemen...',o:['4, &minus;6, 2','&minus;1, 5, 0','4, 2','0, 1, 8'],a:0,p:'Kolom ke-3 = elemen ke-3 dari setiap baris, dibaca dari atas ke bawah: 4, &minus;6, 2.'},
+{t:'in',q:'Pada matriks A = '+mx([[3,-1,4,0],[2,5,-6,1],[7,0,2,8]])+', berapakah nilai a<sub>24</sub>?',a:'1',p:'a<sub>24</sub> = baris ke-2, kolom ke-4. Baris ke-2 = (2, 5, &minus;6, 1); elemen keempatnya adalah 1.'},
+{t:'in',q:'Pada matriks A = '+mx([[3,-1,4,0],[2,5,-6,1],[7,0,2,8]])+', berapakah nilai a<sub>32</sub>?',a:'0',p:'a<sub>32</sub> = baris ke-3, kolom ke-2. Baris ke-3 = (7, 0, 2, 8); elemen keduanya adalah 0.'},
+{t:'mc',q:'Pada matriks A = '+mx([[3,-1,4,0],[2,5,-6,1],[7,0,2,8]])+', angka 5 terletak pada...',o:['Baris ke-2, kolom ke-2','Baris ke-2, kolom ke-1','Baris ke-1, kolom ke-2','Baris ke-3, kolom ke-2'],a:0,p:'5 ada pada baris kedua (2, 5, &minus;6, 1) dan merupakan elemen kedua dari kiri &rarr; baris ke-2, kolom ke-2, sehingga 5 = a<sub>22</sub>.'},
+{t:'in',q:'Berapa banyak elemen yang dimiliki matriks A = '+mx([[3,-1,4,0],[2,5,-6,1],[7,0,2,8]])+'?',a:'12',p:'Ordo A adalah 3 &times; 4, maka banyak elemen = 3 &times; 4 = 12.'},
+{t:'mc',q:'Matriks kolom yang tersusun dari kolom PERTAMA matriks A = '+mx([[3,-1,4,0],[2,5,-6,1],[7,0,2,8]])+' adalah...',o:[mx([[3],[2],[7]]),mx([[3,-1,4,0]]),mx([[0],[1],[8]]),mx([[3,2,7]])],a:0,p:'Kolom pertama: 3, 2, 7 (dari atas ke bawah), ditulis tegak &rarr; matriks kolom 3 &times; 1. Opsi terakhir salah karena ditulis mendatar.'},
+{t:'mc',q:'Matriks baris yang tersusun dari baris KETIGA matriks A = '+mx([[3,-1,4,0],[2,5,-6,1],[7,0,2,8]])+' adalah...',o:[mx([[7,0,2,8]]),mx([[3,-1,4,0]]),mx([[2,5,-6,1]]),mx([[2],[0]])],a:0,p:'Baris ke-3 dibaca mendatar: 7, 0, 2, 8 &rarr; matriks baris 1 &times; 4.'},
+{t:'mc',q:'Perhatikan pernyataan berikut.<br>(i) Baris dibaca mendatar.<br>(ii) Kolom dibaca tegak.<br>(iii) a<sub>21</sub> berarti elemen baris ke-2 kolom ke-1.<br>Pernyataan yang benar:',o:['(i) dan (ii)','(i), (ii), dan (iii)','(i) dan (iii)','hanya (iii)'],a:1,p:'Ketiganya benar. (iii) memang benar karena indeks baris selalu ditulis lebih dulu.'}
+];
+
+QUIZ.lat4=[
+{t:'mc',q:'Matriks '+mx([[4,7,2]])+' termasuk jenis...',o:['Matriks baris','Matriks kolom','Matriks persegi','Matriks nol'],a:0,p:'Hanya ada satu baris (ordo 1 &times; 3) &rarr; matriks baris.'},
+{t:'in',q:'Berapakah ordo sebuah matriks baris yang memiliki 5 elemen?<br><span class="muted small">Format: barisxkolom</span>',a:'1x5',alt:['1 x 5','1X5'],p:'Matriks baris selalu berordo 1 &times; n. Dengan 5 elemen pada satu baris, ordonya 1 &times; 5.'},
+{t:'mc',q:'Matriks '+mx([[6],[-2],[3],[9]])+' termasuk jenis...',o:['Matriks kolom berordo 4 &times; 1','Matriks baris berordo 1 &times; 4','Matriks persegi','Matriks persegi panjang'],a:0,p:'Susunannya tegak dalam satu kolom: 4 baris, 1 kolom &rarr; matriks kolom berordo 4 &times; 1.'},
+{t:'mc',q:'Manakah yang merupakan matriks persegi?',o:[mx([[1,2,3],[4,5,6]]),mx([[2,0],[0,2]]),mx([[1],[2]]),mx([[1,2],[3,4],[5,6]])],a:1,p:'Matriks kedua berordo 2 &times; 2 (baris = kolom) &rarr; persegi. Yang lain: 2&times;3, 2&times;1, dan 3&times;2 &mdash; semuanya persegi panjang atau kolom/baris.'},
+{t:'mc',q:'Matriks persegi panjang adalah matriks yang...',o:['Banyak barisnya &ne; banyak kolomnya','Banyak barisnya = banyak kolomnya','Semua elemennya pecahan','Elemennya semuanya nol'],a:0,p:'Persegi panjang: m &ne; n, contohnya 2 &times; 3. Nama "persegi panjang" memang diambil dari bentuk kotaknya yang memanjang.'},
+{t:'in',q:'Matriks '+mx([[0,0],[0,0],[0,0]])+' disebut matriks ... <span class="muted small">(satu kata)</span>',a:'nol',alt:['0','matriks nol','null'],p:'Semua elemennya 0 &rarr; matriks nol (matriks null), dilambangkan O. Matriks ini berordo 3 &times; 2.'},
+{t:'mc',q:'Ciri khas matriks diagonal adalah...',o:['Persegi, dengan semua elemen di LUAR diagonal utama bernilai 0','Semua elemennya 0','Elemen diagonalnya 0','Barisnya sama dengan kolomnya saja'],a:0,p:'Matriks diagonal harus persegi; elemen non-diagonal = 0, sedangkan elemen diagonalnya bebas (boleh apa saja, termasuk 0). Contoh: '+mx([[6,0],[0,-2]])},
+{t:'mc',q:'Matriks '+mx([[6,0],[0,6]])+' termasuk...',o:['Matriks skalar','Matriks identitas','Matriks nol','Matriks baris'],a:0,p:'Diagonal utamanya sama (6 dan 6) dan non-diagonal nol &rarr; matriks skalar. Ia bukan identitas karena identitas mensyaratkan diagonal bernilai 1.'},
+{t:'mc',q:'Manakah matriks segitiga ATAS?',o:[mx([[2,5,1],[0,3,7],[0,0,4]]),mx([[2,0,0],[5,3,0],[1,7,4]]),mx([[2,0,1],[0,3,0],[1,0,4]]),mx([[1,5,1],[2,3,7],[0,0,4]])],a:0,p:'Segitiga atas: semua elemen DI BAWAH diagonal utama nol (a<sub>21</sub> = a<sub>31</sub> = a<sub>32</sub> = 0). Opsi kedua justru segitiga bawah; opsi keempat punya a<sub>21</sub> = 2 &ne; 0.'},
+{t:'mc',q:'Matriks A = '+mx([[1,4],[4,2]])+' termasuk matriks...',o:['Simetri','Antisimetri','Segitiga atas','Nol'],a:0,p:'Elemen bercermin sama: a<sub>12</sub> = a<sub>21</sub> = 4, sehingga A<sup>T</sup> = A &rarr; simetri. (Antisimetri mensyaratkan a<sub>ij</sub> = &minus;a<sub>ji</sub> dan diagonalnya nol.)'}
+];
+
+QUIZ.lat5=[
+{t:'mc',q:'Dua matriks A dan B dikatakan sama (A = B) jika...',o:['Ordonya sama DAN semua elemen seletak sama','Jumlah semua elemennya sama','Bentuknya sama saja','Ordonya sama saja'],a:0,p:'Dua syarat harus terpenuhi BERSAMAAN: ordo sama, lalu setiap pasangan elemen seletak bernilai sama. Jumlah elemen yang sama tidak cukup.'},
+{t:'in',q:'Jika '+mx([['x',4],[2,7]])+' = '+mx([[9,4],[2,7]])+', berapakah nilai x?',a:'9',p:'Elemen seletak a<sub>11</sub> = b<sub>11</sub> memberikan x = 9. Elemen lain sudah sama sehingga tidak memberi persamaan baru.'},
+{t:'in',q:'Jika '+mx([[3,'y']])+' = '+mx([[3,-8]])+', berapakah nilai y?',a:'-8',alt:['−8'],p:'Cocokkan elemen kedua: y = &minus;8. Perhatikan menuliskan bilangan negatif dengan benar.'},
+{t:'mc',q:'Apakah A = '+mx([[1,2],[3,4]])+' dapat sama dengan B = '+mx([[1,2,3],[4,5,6]])+'?',o:['Tidak, karena ordonya berbeda (2&times;2 vs 2&times;3)','Ya, asalkan semua elemennya disamakan','Ya, karena jumlah elemennya sama-sama 4... eh 6','Tidak dapat ditentukan'],a:0,p:'Syarat pertama sudah gagal: ordo A = 2 &times; 2 sedangkan ordo B = 2 &times; 3. Matriks dengan ordo berbeda TIDAK PERNAH bisa sama, apa pun isinya.'},
+{t:'in',q:'Jika '+mx([['2x',5]])+' = '+mx([[12,5]])+', berapakah nilai x?',a:'6',p:'Cocokkan elemen pertama: 2x = 12 &rarr; x = 6. Elemen kedua sudah sama (5 = 5).'},
+{t:'in',q:'Dari kesamaan '+mx([['x-3',1],[4,'y+2']])+' = '+mx([[7,1],[4,9]])+', berapakah nilai x?',a:'10',p:'a<sub>11</sub> = b<sub>11</sub> &rarr; x &minus; 3 = 7 &rarr; x = 10. (Untuk info: y + 2 = 9 memberi y = 7.)'},
+{t:'in',q:'Diketahui '+mx([['a','b'],['c','d']])+' = '+mx([[2,-1],[5,0]])+'. Berapakah nilai a + b?',a:'1',p:'Dari kesamaan: a = 2 dan b = &minus;1, sehingga a + b = 2 + (&minus;1) = 1.'},
+{t:'in',q:'Jika '+mx([['x+y','x-y']])+' = '+mx([[7,1]])+', berapakah nilai y?',a:'3',p:'Dari seletak: x + y = 7 dan x &minus; y = 1. Jumlahkan kedua persamaan: 2x = 8 &rarr; x = 4. Maka y = 7 &minus; 4 = 3.'},
+{t:'mc',q:'Pasangan matriks berikut yang SALING SAMA adalah...',o:[mx([[1,2],[3,4]])+' dan '+mx([[1,2],[4,3]]),mx([[0,0],[0,0]])+' dan '+mx([[0,0]]),mx([[5]])+' dan '+mx([[5]]),mx([[2,3]])+' dan '+mx([[2],[3]])],a:2,p:'Opsi ketiga: keduanya ordo 1 &times; 1 dengan elemen sama &rarr; SAMA. Opsi pertama: elemen seletak berbeda. Opsi kedua: ordo 2&times;2 vs 1&times;2. Opsi keempat: ordo 1&times;2 vs 2&times;1.'},
+{t:'in',q:'Diketahui '+mx([[3,'k+2'],[1,6]])+' = '+mx([[3,9],[1,6]])+'. Berapakah nilai k?',a:'7',p:'Cocokkan posisi a<sub>12</sub>: k + 2 = 9 &rarr; k = 7.'}
+];
+/* ================= BANK SOAL: MATERI 6-10 + EXIT TICKET ================= */
+QUIZ.lat6=[
+{t:'mc',q:'Hasil dari '+mx([[1,2],[3,4]])+' + '+mx([[5,6],[7,8]])+' adalah...',o:[mx([[6,8],[10,12]]),mx([[4,-4],[-4,-4]]),mx([[12,10],[16,8]]),mx([[6,7],[11,12]])],a:0,p:'Jumlahkan seletak: 1+5=6; 2+6=8; 3+7=10; 4+8=12. Opsi kedua adalah selisihnya, opsi ketiga tertukar posisi, opsi keempat salah pasangan.'},
+{t:'in',q:'Diketahui '+mx([[2,3],[-1,4]])+' + '+mx([[6,0],[5,-2]])+'. Berapakah elemen a<sub>11</sub> dari hasilnya?',a:'8',p:'a<sub>11</sub> hasil = 2 + 6 = 8. Bandingkan posisi: keduanya baris 1 kolom 1.'},
+{t:'mc',q:'Apakah operasi '+mx([[1,2]])+' + '+mx([[1],[2]])+' dapat dilakukan?',o:['Tidak, karena ordonya berbeda (1&times;2 vs 2&times;1)','Ya, hasilnya '+mx([[2,4]]),'Ya, hasilnya '+mx([[2],[4]]),'Ya, hasilnya 6'],a:0,p:'Syarat mutlak penjumlahan: ordo sama. Ordo 1 &times; 2 dan 2 &times; 1 berbeda, jadi penjumlahannya tidak terdefinisi &mdash; sekalipun angkanya terlihat "cocok".'},
+{t:'in',q:'Dari '+mx([[7,-2],[3,5]])+' + '+mx([[-1,2],[4,-5]])+', berapakah elemen pada baris ke-2 kolom ke-1 hasilnya?',a:'7',p:'Posisi (2,1): 3 + 4 = 7.'},
+{t:'mc',q:'Sifat yang menyatakan A + B = B + A disebut sifat...',o:['Komutatif','Asosiatif','Distributif','Identitas'],a:0,p:'Komutatif = boleh ditukar urutannya. Asosiatif soal pengelompokan tanda kurung, distributif soal perkalian skalar, identitas soal A + O = A.'},
+{t:'in',q:'Jika '+mx([[4,9],[1,6]])+' dijumlahkan dengan matriks nol 2 &times; 2, berapakah elemen a<sub>22</sub> hasilnya?',a:'6',p:'A + O = A (sifat identitas). Jadi hasilnya matriks A sendiri dan a<sub>22</sub>-nya tetap 6.'},
+{t:'in',q:'Diketahui A = '+mx([[3,1],[2,2]])+'. Berapakah elemen a<sub>12</sub> dari A + A?',a:'2',p:'A + A = 2A. Posisi (1,2): 1 + 1 = 2. Setiap elemen "kedua kalinya".'},
+{t:'in',q:'Penjualan roti Toko A = 20 buah dan Toko B = 10 buah. Dalam matriks (baris = toko), total roti kedua toko adalah elemen hasil penjumlahan dua matriks. Berapa totalnya?',a:'30',p:'Total = penjumlahan seletak: 20 + 10 = 30. Inilah kegunaan nyata penjumlahan matriks: menggabungkan data.'},
+{t:'mc',q:'Jika A berordo 2 &times; 3 dan B berordo 3 &times; 2, maka A + B...',o:['Tidak terdefinisi','Berordo 2 &times; 3','Berordo 3 &times; 2','Berordo 2 &times; 2'],a:0,p:'Ordo berbeda (2&times;3 &ne; 3&times;2) &rarr; penjumlahan tidak dapat dilakukan. Tidak ada "penjumlahan sebagian".'},
+{t:'in',q:'Hasil '+mx([[5,4],[1,0]])+' + '+mx([[-5,2],[3,-1]])+' adalah '+mx([['a','b'],['c','d']])+'. Berapakah nilai a + b + c + d?',a:'9',p:'Jumlahkan seletak: hasilnya '+mx([[0,6],[4,-1]])+'. Jumlah semua elemen: 0 + 6 + 4 + (&minus;1) = 9.'}
+];
+
+QUIZ.lat7=[
+{t:'mc',q:'Hasil dari '+mx([[5,7],[9,2]])+' &minus; '+mx([[2,3],[4,1]])+' adalah...',o:[mx([[3,4],[5,1]]),mx([[7,10],[13,3]]),mx([[-3,-4],[-5,-1]]),mx([[3,10],[5,3]])],a:0,p:'Kurangkan seletak: 5&minus;2=3; 7&minus;3=4; 9&minus;4=5; 2&minus;1=1. Opsi kedua adalah hasil penjumlahan, opsi ketiga tanda terbalik.'},
+{t:'in',q:'Dari '+mx([[4,8],[6,3]])+' &minus; '+mx([[1,5],[2,0]])+', berapakah elemen a<sub>12</sub> hasilnya?',a:'3',p:'Posisi (1,2): 8 &minus; 5 = 3.'},
+{t:'mc',q:'Untuk setiap matriks persegi A, hasil A &minus; A adalah...',o:['Matriks nol','Matriks A sendiri','2A','Matriks identitas'],a:0,p:'Setiap elemen dikurangi dirinya sendiri menghasilkan 0 &rarr; matriks nol seordo. Inilah alasan A + (&minus;A) = O.'},
+{t:'in',q:'Dari '+mx([[9,1],[-4,7]])+' &minus; '+mx([[5,1],[-4,2]])+', berapakah elemen pada baris ke-2 kolom ke-1 hasilnya?',a:'0',p:'Posisi (2,1): &minus;4 &minus; (&minus;4) = &minus;4 + 4 = 0. Minus bertemu minus menjadi tambah!'},
+{t:'mc',q:'Diketahui A = '+mx([[6,2]])+' dan B = '+mx([[1,5]])+'. Hasil B &minus; A adalah...',o:[mx([[-5,3]]),mx([[5,-3]]),mx([[7,7]]),mx([[-5,-3]])],a:0,p:'B &minus; A: 1&minus;6 = &minus;5 dan 5&minus;2 = 3. Urutan penting! Jika A &minus; B hasilnya '+mx([[5,-3]])+' &mdash; persis kebalikan.'},
+{t:'in',q:'Stok awal kantin '+mx([[25,40],[18,30]])+' (baris: gorengan, minuman; kolom: pagi, siang) dan terjual '+mx([[10,22],[9,15]])+'. Berapa sisa minuman pada waktu siang (elemen baris 2, kolom 2)?',a:'18',p:'Sisa = awal &minus; terjual: 30 &minus; 22 = 18. Soal cerita pengurangan matriks = kurangkan data seletak.'},
+{t:'mc',q:'Pengurangan A &minus; B dapat dilakukan jika...',o:['Ordo A sama dengan ordo B','A dan B keduanya persegi','B adalah matriks nol','Selalu dapat dilakukan'],a:0,p:'Sama seperti penjumlahan: syaratnya ordo sama. Ukuran matriks tidak boleh berbeda saat dikurangkan.'},
+{t:'in',q:'Dari '+mx([[10,-3],[4,8]])+' &minus; '+mx([[6,-3],[-4,8]])+', berapakah elemen pada baris ke-2 kolom ke-1 hasilnya?',a:'8',p:'Posisi (2,1): 4 &minus; (&minus;4) = 4 + 4 = 8. Cermati tanda minus ganda.'},
+{t:'mc',q:'Jika A = '+mx([[12,5],[7,9]])+' dan A &minus; B = '+mx([[3,1],[0,4]])+', maka B = ...',o:[mx([[9,4],[7,5]]),mx([[15,6],[7,13]]),mx([[9,6],[7,5]]),mx([[36,5],[0,36]])],a:0,p:'Pindah ruas: B = A &minus; '+mx([[3,1],[0,4]])+' = '+mx([[9,4],[7,5]])+'. Cek: 12&minus;3=9, 5&minus;1=4, 7&minus;0=7, 9&minus;4=5.'},
+{t:'in',q:'Diketahui '+mx([['x',3],[2,8]])+' &minus; '+mx([[2,1],[5,8]])+' = '+mx([[5,2],[-3,0]])+'. Berapakah nilai x?',a:'7',p:'Bandingkan posisi (1,1): x &minus; 2 = 5 &rarr; x = 7. Posisi lain sudah cocok: 3&minus;1=2 &check;, 2&minus;5=&minus;3 &check;, 8&minus;8=0 &check;.'}
+];
+
+QUIZ.lat8=[
+{t:'mc',q:'Hasil dari 3 &times; '+mx([[1,2],[3,4]])+' adalah...',o:[mx([[3,6],[9,12]]),mx([[3,2],[3,4]]),mx([[1,2],[9,4]]),mx([[4,5],[6,7]])],a:0,p:'Semua elemen dikali 3: 3&times;1=3; 3&times;2=6; 3&times;3=9; 3&times;4=12. Opsi lain salah mengalikan sebagian elemen saja.'},
+{t:'in',q:'Diketahui &minus;2 &times; '+mx([[4,-1],[0,5]])+'. Berapakah elemen a<sub>12</sub> hasilnya?',a:'2',p:'&minus;2 &times; (&minus;1) = 2. Tanda minus dikali minus menghasilkan plus &mdash; kesalahan favorit di soal seperti ini!'},
+{t:'in',q:'Diketahui <span class="frac"><span>1</span><span>2</span></span> &times; '+mx([[2,8],[4,6]])+'. Berapakah elemen pada baris ke-2 kolom ke-1 hasilnya?',a:'2',p:'&frac12; &times; 4 = 2. Semua elemen dikali &frac12;: hasilnya '+mx([[1,4],[2,3]])},
+{t:'mc',q:'Untuk matriks A apa pun, 0 &times; A = ...',o:['Matriks nol','Matriks A','Matriks identitas','Tidak terdefinisi'],a:0,p:'0 &times; setiap elemen = 0, sehingga 0A = O (matriks nol seordo dengan A). Perkalian skalar dengan nol SELALU boleh.'},
+{t:'in',q:'Jika A = '+mx([[3,-6],[9,0]])+', berapakah elemen a<sub>21</sub> dari &minus;A?',a:'-9',alt:['−9'],p:'&minus;A = (&minus;1) &times; A. Elemen (2,1): &minus;1 &times; 9 = &minus;9. &minus;A disebut lawan jumlah dari A karena A + (&minus;A) = O.'},
+{t:'mc',q:'Bentuk sederhana dari 2A + 3A adalah...',o:['5A','6A','A<sup>5</sup>','10A'],a:0,p:'Sifat distributif skalar: (2 + 3)A = 5A. Skalar dijumlahkan, bukan dikalikan.'},
+{t:'in',q:'Jika 2A = '+mx([[8,-4],[0,6]])+', berapakah elemen a<sub>11</sub> dari A?',a:'4',p:'A = &frac12; &times; '+mx([[8,-4],[0,6]])+' = '+mx([[4,-2],[0,3]])+', sehingga a<sub>11</sub> = 4.'},
+{t:'in',q:'Harga roti Rp5.000 dan susu Rp7.000 disusun sebagai matriks '+mx([[5000,7000]])+'. Jika semua harga naik 2 kali lipat, berapakah harga susu yang baru?',a:'14000',alt:['14.000','14 ribu'],p:'Kalikan matriks dengan skalar 2: 2 &times; 7000 = 14000. (Matriks harganya menjadi '+mx([[10000,14000]])+')'},
+{t:'mc',q:'Hasil dari 4 &times; '+mx([[1,-2],[3,0]])+' adalah...',o:[mx([[4,-8],[12,0]]),mx([[4,-2],[12,0]]),mx([[5,2],[7,4]]),mx([[4,-8],[3,0]])],a:0,p:'Semua elemen kali 4: 1&times;4=4; &minus;2&times;4=&minus;8; 3&times;4=12; 0&times;4=0.'},
+{t:'in',q:'Jika k &times; '+mx([[2,5],[-1,3]])+' = '+mx([[-6,-15],[3,-9]])+', berapakah nilai k?',a:'-3',alt:['−3'],p:'Bandingkan elemen (1,1): 2k = &minus;6 &rarr; k = &minus;3. Cek elemen lain: 5&times;(&minus;3)=&minus;15 &check;, &minus;1&times;(&minus;3)=3 &check;, 3&times;(&minus;3)=&minus;9 &check;.'}
+];
+
+QUIZ.lat9=[
+{t:'mc',q:'Operasi yang TIDAK dikenal antara dua matriks adalah...',o:['Pembagian','Penjumlahan','Pengurangan','Perkalian dengan skalar'],a:0,p:'Matriks tidak punya operasi pembagian langsung antar sesamanya. Yang dipakai sebagai "pengganti pembagian" adalah perkalian dengan matriks invers (materi lanjutan).'},
+{t:'in',q:'Hasil '+mx([[8,6],[4,2]])+' : 2 adalah '+mx([['a','b'],['c','d']])+'. Berapakah nilai a?',a:'4',p:'Setiap elemen dibagi 2: 8:2=4; 6:2=3; 4:2=2; 2:2=1. Elemen pertamanya (a) adalah 4.'},
+{t:'in',q:'Dari '+mx([[10,-15],[20,5]])+' : 5, berapakah elemen pada baris ke-2 kolom ke-1 hasilnya?',a:'4',p:'20 : 5 = 4. Semua elemen dibagi 5: hasilnya '+mx([[2,-3],[4,1]])},
+{t:'mc',q:'Operasi A : k (dengan skalar k &ne; 0) sama saja dengan...',o:['A dikali <span class="frac"><span>1</span><span>k</span></span>','A dikali k','A ditambah k','A dikali k<sup>2</sup>'],a:0,p:'Membagi dengan k = mengalikan dengan kebalikannya: A : k = (1/k)A. Inilah alasan "pembagian matriks oleh skalar" sebenarnya adalah perkalian skalar pecahan.'},
+{t:'in',q:'Diketahui <span class="frac"><span>1</span><span>2</span></span> &times; '+mx([[5,10],[15,20]])+'. Berapakah elemen a<sub>12</sub> hasilnya?',a:'5',p:'&frac12; &times; 10 = 5, atau 10 : 2 = 5. Perkalian pecahan dan pembagian skalar adalah dua wajah dari operasi yang sama.'},
+{t:'mc',q:'Benar atau salah: '+mx([[6,9]])+' : 3 = '+mx([[2,3]])+' ?',o:['BENAR','SALAH'],a:0,p:'BENAR. Setiap elemen dibagi 3: 6:3=2 dan 9:3=3. Pembagian oleh skalar dilakukan elemen demi elemen.'},
+{t:'in',q:'Dari '+mx([[12,-18],[6,0]])+' : (&minus;3), berapakah elemen a<sub>12</sub> hasilnya?',a:'6',p:'&minus;18 : (&minus;3) = 6 (negatif dibagi negatif = positif). Hasil lengkapnya '+mx([[-4,6],[-2,0]])},
+{t:'mc',q:'Mengapa matriks TIDAK BOLEH dibagi dengan skalar 0?',o:['Pembagian oleh nol tidak terdefinisi','Karena hasilnya matriks nol','Karena matriks akan hilang','Sebenarnya boleh saja'],a:0,p:'Aturan yang sama dengan bilangan biasa: membagi sesuatu dengan 0 tidak terdefinisi. Jadi syarat A : k hanya k &ne; 0.'},
+{t:'mc',q:'Bentuk yang setara dengan (A + B) : 2 adalah...',o:['A : 2 + B : 2','(A + B) : 4','A + B','Tidak bisa disederhanakan'],a:0,p:'Pembagian oleh skalar bersifat distributif terhadap penjumlahan: setiap elemen (a<sub>ij</sub> + b<sub>ij</sub>) : 2 = a<sub>ij</sub> : 2 + b<sub>ij</sub> : 2.'},
+{t:'in',q:'Jika A : 4 = '+mx([[3,1],[-2,5]])+', berapakah elemen a<sub>22</sub> dari matriks A?',a:'20',p:'Kembalikan: A = 4 &times; '+mx([[3,1],[-2,5]])+' = '+mx([[12,4],[-8,20]])+', sehingga a<sub>22</sub> = 20.'}
+];
+
+QUIZ.lat10=[
+{t:'mc',q:'Transpose dari A = '+mx([[1,2],[3,4]])+' adalah...',o:[mx([[1,3],[2,4]]),mx([[4,3],[2,1]]),mx([[2,1],[4,3]]),mx([[1,2],[3,4]])],a:0,p:'Baris menjadi kolom: baris (1,2) menjadi kolom pertama, baris (3,4) menjadi kolom kedua &rarr; '+mx([[1,3],[2,4]])+'. Opsi kedua adalah membalik urutan seluruh elemen &mdash; itu bukan transpose.'},
+{t:'in',q:'Jika A berordo 2 &times; 3, berapakah ordo A<sup>T</sup>?<br><span class="muted small">Format: barisxkolom</span>',a:'3x2',alt:['3 x 2','3X2'],p:'Transpose menukar ordo: m &times; n menjadi n &times; m. Jadi 2 &times; 3 menjadi 3 &times; 2.'},
+{t:'mc',q:'Hasil dari (A<sup>T</sup>)<sup>T</sup> adalah...',o:['A','A<sup>T</sup>','2A','Matriks nol'],a:0,p:'Sifat involutif: transpose dua kali mengembalikan matriks ke bentuk aslinya. Analogi: memutar meja 90&deg; dua kali lalu balik lagi.'},
+{t:'in',q:'Diketahui A = '+mx([[2,-1],[5,0],[3,7]])+'. Berapakah elemen a<sub>12</sub> dari A<sup>T</sup>?',a:'5',p:'A<sup>T</sup> = '+mx([[2,5,3],[-1,0,7]])+'. Elemen (1,2) dari A<sup>T</sup> = elemen (2,1) dari A = 5. Aturan: (A<sup>T</sup>)<sub>ij</sub> = a<sub>ji</sub>.'},
+{t:'mc',q:'Baris '+mx([[3,8]])+' pada matriks A akan menjadi ... pada A<sup>T</sup>.',o:['Kolom '+mx([[3],[8]]),'Baris '+mx([[8,3]]),'Bagian diagonal','Hilang'],a:0,p:'Inti transpose: baris ke-i berubah menjadi kolom ke-i. Urutan angkanya tetap 3 di atas, 8 di bawah.'},
+{t:'in',q:'Diketahui B = '+mx([[4,7],[2,9]])+'. Berapakah elemen b<sub>12</sub> dari B<sup>T</sup>?',a:'2',p:'B<sup>T</sup> = '+mx([[4,2],[7,9]])+'. Elemen (1,2) dari B<sup>T</sup> adalah 2, yang berasal dari b<sub>21</sub> matriks B.'},
+{t:'mc',q:'Matriks A disebut simetri jika...',o:['A<sup>T</sup> = A','A<sup>T</sup> = &minus;A','A<sup>T</sup> = I','A<sup>T</sup> = O'],a:0,p:'Simetri: hasil transpose-nya sama dengan dirinya. Syarat praktisnya (untuk matriks persegi): a<sub>ij</sub> = a<sub>ji</sub> &mdash; elemen bercermin sama. (A<sup>T</sup> = &minus;A adalah matriks antisimetri.)'},
+{t:'in',q:'Diketahui A = '+mx([[1,2,3],[4,5,6]])+'. Berapakah elemen pada baris ke-3 kolom ke-1 dari A<sup>T</sup>?',a:'3',p:'A<sup>T</sup> = '+mx([[1,4],[2,5],[3,6]])+'. Elemen (3,1) dari A<sup>T</sup> = a<sub>13</sub> = 3.'},
+{t:'mc',q:'Transpose dari matriks baris '+mx([[5,10,15]])+' adalah...',o:['Matriks kolom '+mx([[5],[10],[15]]),'Matriks baris yang sama','Matriks nol','Matriks persegi 3 &times; 3'],a:0,p:'Matriks baris 1 &times; 3 ditranspose menjadi matriks kolom 3 &times; 1. Sebaliknya, transpose matriks kolom menghasilkan matriks baris.'},
+{t:'in',q:'Apakah C = '+mx([[3,0,1],[0,2,4],[1,4,5]])+' merupakan matriks simetri? Jawab "ya" atau "tidak".',a:'ya',alt:['yes','simetri'],p:'Cek elemen bercermin: a<sub>12</sub>=a<sub>21</sub>=0 &check;; a<sub>13</sub>=a<sub>31</sub>=1 &check;; a<sub>23</sub>=a<sub>32</sub>=4 &check;. Semua pasangan sama &rarr; YA, C simetri (C<sup>T</sup> = C).'}
+];
+
+QUIZ.exit=[
+{t:'mc',q:'[Warm-up 1] Ordo matriks '+mx([[2,-1],[0,3],[5,7]])+' adalah...',o:['3 &times; 2','2 &times; 3','3 &times; 3','6 &times; 1'],a:0,p:'3 baris, 2 kolom &rarr; ordo 3 &times; 2. Baris dulu, kolom belakang!'},
+{t:'mc',q:'[Warm-up 2] Nilai a<sub>23</sub> dari '+mx([[1,2,3],[4,5,6],[7,8,9]])+' adalah...',o:['6','8','5','9'],a:0,p:'Baris ke-2, kolom ke-3 &rarr; 6. Hati-hati dengan 8 (itu a<sub>32</sub>).'},
+{t:'mc',q:'[Warm-up 3] Matriks '+mx([[0,0],[0,0]])+' disebut...',o:['Matriks nol','Matriks identitas','Matriks skalar','Matriks diagonal'],a:0,p:'Semua elemen nol &rarr; matriks nol O. Identitas mensyaratkan diagonal 1; skalar mensyaratkan diagonal sama tak nol.'},
+{t:'mc',q:'[Warm-up 4] Matriks persegi dengan diagonal utama 1 dan elemen lain 0 disebut...',o:['Matriks identitas','Matriks nol','Matriks segitiga atas','Matriks skalar'],a:0,p:'Itu definisi matriks identitas I, seperti '+mx([[1,0],[0,1]])+'. I berperan seperti "angka 1" dalam perkalian matriks.'},
+{t:'mc',q:'[Warm-up 5] Agar A = B, syarat yang harus dipenuhi adalah...',o:['Ordo sama dan elemen seletak sama','Ordo sama saja','Elemen seletak sama saja','Jumlah elemennya sama'],a:0,p:'Dua syarat sekaligus: ordo sama LALU semua elemen seletak sama.'},
+{t:'mc',q:'[Operasi 1] Hasil '+mx([[2,3],[1,4]])+' + '+mx([[1,1],[2,0]])+' adalah...',o:[mx([[3,4],[3,4]]),mx([[3,4],[3,3]]),mx([[1,2],[-1,4]]),mx([[2,4],[3,4]])],a:0,p:'Seletak: 2+1=3; 3+1=4; 1+2=3; 4+0=4.'},
+{t:'mc',q:'[Operasi 2] Hasil '+mx([[6,2],[8,4]])+' &minus; '+mx([[5,0],[3,4]])+' adalah...',o:[mx([[1,2],[5,0]]),mx([[11,2],[11,8]]),mx([[-1,-2],[-5,0]]),mx([[1,2],[5,8]])],a:0,p:'Seletak: 6&minus;5=1; 2&minus;0=2; 8&minus;3=5; 4&minus;4=0.'},
+{t:'mc',q:'[Operasi 3] Hasil dari 5 &times; '+mx([[1,1],[2,3]])+' adalah...',o:[mx([[5,5],[10,15]]),mx([[5,1],[2,3]]),mx([[1,1],[10,15]]),mx([[6,6],[7,8]])],a:0,p:'Semua elemen kali 5: 5, 5, 10, 15. Opsi terakhir malah menambahkan 5.'},
+{t:'mc',q:'[Operasi 4] Hasil '+mx([[9,12],[6,3]])+' : 3 adalah...',o:[mx([[3,4],[2,1]]),mx([[9,12],[2,1]]),mx([[3,4],[6,3]]),mx([[27,36],[18,9]])],a:0,p:'Setiap elemen dibagi 3: 3, 4, 2, 1. Opsi terakhir adalah hasil perkalian 3.'},
+{t:'mc',q:'[Operasi 5] Transpose dari '+mx([[1,4],[2,5],[3,6]])+' adalah...',o:[mx([[1,2,3],[4,5,6]]),mx([[6,5,4],[3,2,1]]),mx([[1,2,3],[6,5,4]]),mx([[1,4],[2,5],[3,6]])],a:0,p:'Kolom menjadi baris: baris matriks asal (1,4), (2,5), (3,6) menjadi kolom-kolom hasil transpose &rarr; ordo 3&times;2 menjadi 2&times;3.'}
+];
+/* ================= PERAKITAN SLIDE & MESIN APLIKASI ================= */
+var QUIZ=QUIZ||{};
+var CONTOH={};
+Object.keys(M).forEach(function(k){(M[k].contoh||[]).forEach(function(c){CONTOH[c.id]=c;});});
+
+/* ---------- pembungkus kartu contoh soal ---------- */
+function mountSteps(el,c){
+  el.innerHTML='<div class="ccard"><div class="cq">'+c.q+'</div>'+
+    c.steps.map(function(s,i){return '<div class="stepitem"><b>Langkah '+(i+1)+'.</b> '+s+'</div>';}).join('')+
+    '<div class="answerbox"><b>Jawaban:</b><br>'+c.ans+'</div>'+
+    '<div class="qbtns"><button class="btn bstep">Tampilkan Langkah 1 dari '+c.steps.length+'</button>'+
+    '<button class="btn ghost breset" style="display:none">Ulangi dari awal</button></div></div>';
+  var shown=0;
+  function wire(){
+    el.querySelector('.bstep').addEventListener('click',function(){
+      var items=el.querySelectorAll('.stepitem');
+      if(shown<items.length){items[shown].classList.add('show');shown++;}
+      if(shown>=items.length){
+        el.querySelector('.answerbox').classList.add('show');
+        this.textContent='Semua langkah tampil \u2713';this.disabled=true;
+        el.querySelector('.breset').style.display='';
+      }else{this.textContent='Tampilkan Langkah '+(shown+1)+' dari '+items.length;}
+    });
+    el.querySelector('.breset').addEventListener('click',function(){
+      shown=0;
+      el.querySelectorAll('.stepitem').forEach(function(s){s.classList.remove('show');});
+      el.querySelector('.answerbox').classList.remove('show');
+      var b=el.querySelector('.bstep');b.disabled=false;b.textContent='Tampilkan Langkah 1 dari '+c.steps.length;
+      this.style.display='none';
+    });
+  }
+  wire();
+}
+
+/* ---------- mesin kuis ---------- */
+function mountQuiz(el,qid,qs){
+  var title=el.dataset.title||'Latihan';
+  var h='<div class="quizhead"><b>'+title+'</b><span class="qscore" id="qs-'+qid+'">Dijawab 0/'+qs.length+' \u00b7 Benar 0</span></div>';
+  h+=qs.map(function(q,i){
+    var inner='<div class="qtop"><span class="qnum">Soal '+(i+1)+'</span><span class="qtype">'+(q.t==='mc'?'Pilihan Ganda':'Isian Singkat')+'</span><span class="qbadge"></span></div>'+
+      '<div class="qtext">'+q.q+'</div>';
+    if(q.t==='mc'){
+      inner+='<div class="opts">'+q.o.map(function(op,oi){
+        return '<button class="opt" data-oi="'+oi+'"><span class="ol">'+String.fromCharCode(65+oi)+'.</span><span>'+op+'</span></button>';
+      }).join('')+'</div>';
+    }else{
+      inner+='<input class="qinput" placeholder="Ketik jawabanmu di sini..." autocomplete="off">';
+    }
+    inner+='<div class="qbtns"><button class="btn bcheck">Cek Jawaban</button><button class="btn ghost bsol">Lihat Pembahasan</button></div>'+
+      '<div class="feed"></div><div class="sol"><b>Pembahasan:</b> '+q.p+'</div>';
+    return '<div class="qcard" data-qi="'+i+'">'+inner+'</div>';
+  }).join('');
+  el.innerHTML=h;
+
+  if(!S.score[qid])S.score[qid]={ans:0,ok:0};
+  function updScore(){
+    var sc=S.score[qid];
+    el.querySelector('#qs-'+qid).textContent='Dijawab '+sc.ans+'/'+qs.length+' \u00b7 Benar '+sc.ok;
+  }
+
+  el.addEventListener('click',function(e){
+    var opt=e.target.closest('.opt');
+    if(opt&&!opt.disabled){
+      var card=opt.closest('.qcard');
+      if(card.dataset.done)return;
+      card.querySelectorAll('.opt').forEach(function(x){x.classList.remove('sel');});
+      opt.classList.add('sel');
+      return;
+    }
+    var chk=e.target.closest('.bcheck');
+    if(chk){doCheck(chk.closest('.qcard'));return;}
+    var sol=e.target.closest('.bsol');
+    if(sol){
+      var s=sol.closest('.qcard').querySelector('.sol');
+      s.classList.toggle('show');
+      sol.textContent=s.classList.contains('show')?'Sembunyikan Pembahasan':'Lihat Pembahasan';
+    }
+  });
+  el.addEventListener('keydown',function(e){
+    if(e.key==='Enter'&&e.target.classList.contains('qinput')){
+      doCheck(e.target.closest('.qcard'));
+    }
+  });
+
+  function doCheck(card){
+    if(card.dataset.done)return;
+    var qi=+card.dataset.qi,q=qs[qi];
+    var feed=card.querySelector('.feed'),badge=card.querySelector('.qbadge');
+    if(q.t==='mc'){
+      var sel=card.querySelector('.opt.sel');
+      if(!sel){
+        feed.className='feed show badd';feed.textContent='Pilih salah satu jawaban dulu, ya!';
+        card.classList.add('shake');setTimeout(function(){card.classList.remove('shake');},350);
+        return;
+      }
+      var oi=+sel.dataset.oi,benar=(oi===q.a);
+      card.dataset.done='1';
+      card.querySelectorAll('.opt').forEach(function(x){x.disabled=true;});
+      card.querySelector('.opt[data-oi="'+q.a+'"]').classList.add('right');
+      if(!benar)sel.classList.add('wrong');
+      badge.textContent=benar?'\u2713 Benar':'\u2717 Salah';badge.className='qbadge '+(benar?'ok':'bad');
+      feed.className='feed show '+(benar?'good':'badd');
+      feed.innerHTML=benar?'Tepat sekali! Jawabanmu benar.':'Belum tepat. Jawaban yang benar: <b>'+String.fromCharCode(65+q.a)+'</b>.';
+      S.score[qid].ans++;if(benar)S.score[qid].ok++;
+    }else{
+      var inp=card.querySelector('.qinput'),v=inp.value;
+      if(!v.trim()){
+        feed.className='feed show badd';feed.textContent='Ketik dulu jawabanmu, ya!';
+        card.classList.add('shake');setTimeout(function(){card.classList.remove('shake');},350);
+        return;
+      }
+      var acc=q.alt?[q.a].concat(q.alt):[q.a];
+      var benar=checkInput(v,acc);
+      card.dataset.done='1';
+      inp.disabled=true;
+      badge.textContent=benar?'\u2713 Benar':'\u2717 Salah';badge.className='qbadge '+(benar?'ok':'bad');
+      feed.className='feed show '+(benar?'good':'badd');
+      feed.innerHTML=benar?'Tepat sekali! Jawabanmu benar.':'Belum tepat. Jawaban yang benar: <b>'+q.a+'</b>.';
+      S.score[qid].ans++;if(benar)S.score[qid].ok++;
+    }
+    card.querySelector('.bcheck').disabled=true;
+    card.querySelector('.bsol').style.display='none';
+    card.querySelector('.sol').classList.add('show');
+    updScore();
+  }
+}
+
+/* ---------- slide: cover ---------- */
+function coverHTML(){
+  var chips=['Definisi & Penulisan','Elemen, Ordo, Diagonal','Baris & Kolom','Jenis-Jenis Matriks','Kesamaan Matriks','Penjumlahan','Pengurangan','Perkalian Skalar','Pembagian Matriks','Transpose'];
+  return '<div class="cover">'+
+    '<div class="sub">Matematika \u00b7 Fase F \u00b7 Kelas XI \u00b7 Kurikulum Merdeka</div>'+
+    '<h1>MATRIKS</h1>'+
+    '<p class="desc">Menjelajah susunan angka ajaib: dari jadwal pelajaran dan denah kursi sampai filter foto di HP-mu.</p>'+
+    '<div class="covermtx">'+mx([[2,-1,0],[4,3,7],[1,5,8]],{big:1})+'</div>'+
+    '<div class="topicgrid">'+chips.map(function(c,i){return '<div class="tchip"><b>'+(i+1)+'</b>'+c+'</div>';}).join('')+'</div>'+
+    '<p class="muted small" style="margin-top:20px">Klik <b>Berikutnya \u2192</b> atau tekan tombol panah keyboard untuk mulai. Menu \u2630 di kiri atas untuk lompat ke bab mana pun.</p>'+
+  '</div>';
+}
+
+/* ---------- slide: matriks di sekitar kita ---------- */
+function introHTML(){
+  var items=[
+    ['📅','Jadwal & Denah','Jadwal pelajaran, denah kursi bioskop, dan papan peringkat semuanya data dua dimensi &mdash; baris dan kolom, persis matriks.'],
+    ['🎮','Game & Animasi 3D','Posisi karakter game disimpan sebagai matriks koordinat. Saat karakter berputar atau bergerak, yang bekerja adalah matriks.'],
+    ['📷','Filter Foto','Foto di HP-mu adalah matriks angka kecerahan warna. Saat kamu memakai filter atau memperjelas wajah, HP menghitung matriks jutaan piksel.'],
+    ['👥','Jaringan Sosial','Hubungan "siapa berteman dengan siapa" dipetakan sebagai matriks. Dari situlah media sosial merekomendasikan teman baru.'],
+    ['💰','Ekonomi & Bisnis','Tabel penjualan, harga, dan stok toko berbentuk matriks. Penjumlahan matriks menggabungkan data antar cabang.'],
+    ['🔐','Kriptografi','Pesan rahasia bisa disandikan dengan matriks. Nanti di kalian yang lebih tinggi, matriks invers dipakai untuk menyandikan dan membukanya.']
+  ];
+  return '<p class="lead">Sebelum masuk ke rumus, coba lihat sekeliling: matriks bukan sekadar tabel angka di buku. Ia adalah cara komputer dan ilmuwan <b>mengemas data dua dimensi</b> agar bisa dihitung.</p>'+
+    '<div class="grid3">'+items.map(function(it){
+      return '<div class="card"><h3>'+it[0]+' '+it[1]+'</h3><p class="small">'+it[2]+'</p></div>';
+    }).join('')+'</div>'+
+    '<div class="note tahu"><b>Fokus kita hari ini</b><br>Hari ini kalian membangun <b>fondasi</b>: apa itu matriks, komponennya, jenis-jenisnya, dan operasi dasarnya (jumlah, kurang, kali skalar, bagi skalar, transpose). Fondasi inilah yang nanti dipakai untuk perkalian dua matriks, determinan, dan invers.</div>';
+}
+
+/* ---------- slide: tujuan pembelajaran ---------- */
+function objectivesHTML(){
+  var tp=[
+    'Menjelaskan definisi matriks dan menuliskan data nyata dalam bentuk matriks',
+    'Mengidentifikasi elemen (a<sub>ij</sub>), ordo, dan diagonal utama sebuah matriks',
+    'Membedakan baris dan kolom serta membaca posisi elemen dengan tepat',
+    'Mengklasifikasikan jenis-jenis matriks menurut ordo dan menurut sifat elemennya',
+    'Menentukan apakah dua matriks sama, lalu mencari nilai variabel yang belum diketahui',
+    'Melakukan operasi penjumlahan, pengurangan, perkalian skalar, dan pembagian skalar pada matriks',
+    'Menentukan transpose matriks dan memakainya untuk menguji kessimetrian'
+  ];
+  return '<p class="lead">Setelah mengikuti pembelajaran ini, kalian diharapkan mampu:</p>'+
+    '<div class="card"><ol class="steps">'+tp.map(function(t){return '<li>'+t+'</li>';}).join('')+'</ol></div>'+
+    '<div class="grid2"><div class="note tahu" style="margin:0"><b>Sejalan dengan Kurikulum Merdeka</b><br>Materi ini menguatkan elemen <b>Aljabar</b> Fase F: "menyelesaikan masalah yang melibatkan operasi aljabar matriks dan transpose matriks, serta sifat-sifatnya."</div>'+
+    '<div class="note sukses" style="margin:0"><b>Alur petualangan kita</b><br>Definisi &rarr; Komponen &rarr; Baris-Kolom &rarr; Jenis &rarr; Kesamaan &rarr; Operasi (+, &minus;, &times; skalar, : skalar) &rarr; Transpose. Setiap materi ada <b>contoh berlangkah</b>, <b>10 latihan</b>, dan ditutup <b>exit ticket</b>.</div></div>';
+}
+
+/* ---------- pabrik slide materi/contoh/latihan ---------- */
+function mSlide(m,extra){
+  return {ac:m.ac,kicker:'Materi '+m.num+(extra?' \u00b7 Lanjutan':''),title:m.title,html:m.body,grp:'Materi '+m.num};
+}
+function cSlide(m,contohIds,sub){
+  return {ac:m.ac,kicker:'Materi '+m.num+(sub?' \u00b7 Lanjutan':''),title:'Contoh Soal &amp; Pembahasan',
+    html:'<p class="lead">Amati dulu cara berpikirnya, baru latihan. Tekan tombol <b>Tampilkan Langkah</b> untuk memunculkan penyelesaian satu per satu &mdash; coba tebak dulu langkah berikutnya sebelum menekan!</p>'+
+      contohIds.map(function(id){return '<div data-steps="'+id+'"></div>';}).join(''),
+    grp:'Materi '+m.num};
+}
+function lSlide(m,qid,topic){
+  return {ac:m.ac,kicker:'Materi '+m.num,title:'Latihan: Uji Pemahamanmu',
+    html:'<p class="lead">Sepuluh soal menantimu: campuran <b>pilihan ganda</b> dan <b>isian singkat</b>. Pilih/ketik jawaban lalu tekan <b>Cek Jawaban</b>; penjelasan lengkap muncul lewat <b>Lihat Pembahasan</b>. Skormu tercatat di bilah biru.</p>'+
+      '<div data-quiz="'+qid+'" data-title="Latihan Materi '+m.num+' &mdash; '+topic+'"></div>',
+    grp:'Materi '+m.num};
+}
+
+/* ---------- SLIDES ---------- */
+var SLIDES=[
+  {ac:'#1E3A5F',html:coverHTML(),grp:'Pengantar',plain:1},
+  {ac:'#1E3A5F',kicker:'Pengantar',title:'Matriks di Sekitar Kita',html:introHTML(),grp:'Pengantar'},
+  {ac:'#1E3A5F',kicker:'Pengantar',title:'Tujuan Pembelajaran',html:objectivesHTML(),grp:'Pengantar'},
+  mSlide(M.m1), cSlide(M.m1,['c1a','c1b']), lSlide(M.m1,'lat1','Definisi &amp; Penulisan'),
+  mSlide(M.m2), cSlide(M.m2,['c2a','c2b']), lSlide(M.m2,'lat2','Komponen Matriks'),
+  mSlide(M.m3), cSlide(M.m3,['c3a','c3b']), lSlide(M.m3,'lat3','Baris &amp; Kolom'),
+  mSlide(M.m4), cSlide(M.m4,['c4a','c4b']),
+  mSlide(M.m4b,1), cSlide(M.m4,['c4c','c4d'],1),
+  lSlide(M.m4,'lat4','Jenis-Jenis Matriks'),
+  mSlide(M.m5), cSlide(M.m5,['c5a','c5b']), lSlide(M.m5,'lat5','Kesamaan Matriks'),
+  mSlide(M.m6), cSlide(M.m6,['c6a','c6b']), lSlide(M.m6,'lat6','Penjumlahan'),
+  mSlide(M.m7), cSlide(M.m7,['c7a','c7b']), lSlide(M.m7,'lat7','Pengurangan'),
+  mSlide(M.m8), cSlide(M.m8,['c8a','c8b']), lSlide(M.m8,'lat8','Perkalian Skalar'),
+  mSlide(M.m9), cSlide(M.m9,['c9a','c9b']), lSlide(M.m9,'lat9','Pembagian Matriks'),
+  mSlide(M.m10), cSlide(M.m10,['c10a','c10b']), lSlide(M.m10,'lat10','Transpose'),
+  {ac:'#B23A48',kicker:'Evaluasi',title:'Exit Ticket: 10 Soal Kilat',
+   html:'<p class="lead">Tibalah di gerbang akhir! Exit ticket ini merangkum <b>semua 10 materi</b>. Kerjakan mandiri &mdash; anggap saja tiket keluar kelas: sudah paham atau perlu diulang? Waktu yang disarankan: <b>15 menit</b>.</p>'+
+     '<div data-quiz="exit" data-title="Exit Ticket &mdash; Uji Kilat Sepuluh Materi"></div>',
+   grp:'Evaluasi'},
+  {ac:'#1E3A5F',kicker:'Penutup',title:'Kesimpulan',html:kesimpulanHTML(),grp:'Penutup'},
+  {ac:'#2A9D8F',kicker:'Penutup',title:'Refleksi Diri',html:refleksiHTML(),grp:'Penutup'},
+  {ac:'#1E3A5F',kicker:'Penutup \u00b7 Sampai Jumpa',html:penutupHTML(),grp:'Penutup'}
+];
+
+function kesimpulanHTML(){
+  var s=[
+    ['#D64545','1. Definisi & Penulisan','Susunan bilangan dalam baris & kolom, diapit ( ) atau [ ]; dinamai huruf kapital; elemen ditulis a<sub>ij</sub>.'],
+    ['#E8871E','2. Komponen','Elemen a<sub>ij</sub> (baris i, kolom j), ordo m &times; n (baris dulu!), diagonal utama hanya pada matriks persegi.'],
+    ['#A87900','3. Baris & Kolom','Baris = mendatar, kolom = tegak. Banyak elemen = m &times; n.'],
+    ['#2A9D8F','4. Jenis Matriks','Menurut ordo: baris, kolom, persegi, persegi panjang. Menurut sifat: nol, diagonal, skalar, identitas, segitiga atas/bawah, simetri.'],
+    ['#7C5CBF','5. Kesamaan','Syarat: ordo sama DAN elemen seletak sama &mdash; pintu mencari variabel dalam matriks.'],
+    ['#2D7DD2','6. Penjumlahan','Harus seordo; jumlahkan seletak; komutatif & asosiatif; A + O = A.'],
+    ['#C2478F','7. Pengurangan','Harus seordo; kurangkan seletak; A &minus; B = &minus;(B &minus; A), urutan penting!'],
+    ['#4C9F70','8. Perkalian Skalar','Semua elemen &times; k; distributif; k = &minus;1 memberi lawan jumlah.'],
+    ['#B85C38','9. Pembagian','Tidak ada pembagian antar matriks. A : k = (1/k)A untuk k &ne; 0; antar matriks pakai invers (nanti).'],
+    ['#5E60CE','10. Transpose','Baris &hArr; kolom; ordo ikut bertukar; (A<sup>T</sup>)<sup>T</sup> = A; A simetri &hArr; A<sup>T</sup> = A.']
+  ];
+  return '<p class="lead">Sepuluh stasiun sudah kalian lewati. Ini peta ringkasnya &mdash; gunakan untuk belajar ulang cepat sebelum ulangan.</p>'+
+    '<div class="summary">'+s.map(function(x){return '<div class="scard" style="--sc:'+x[0]+'"><b>'+x[1]+'</b><p>'+x[2]+'</p></div>';}).join('')+'</div>'+
+    '<div class="note sukses" style="margin-top:16px"><b>Satu kalimat penutup</b><br>Matriks hanyalah tabel angka yang diatur rapi &mdash; tetapi karena aturannya rapi, komputer, ekonom, dan ilmuwan bisa menghitung dunia dengan cepat. Kuasai aturan dasarnya, dan bab-bab lanjutan akan terasa mudah.</div>';
+}
+function refleksiHTML(){
+  return '<p class="lead">Sebelum pulang, luangkan 2 menit untuk jujur pada diri sendiri: sejauh mana pemahamanmu, dan apa yang masih perlu diulang? Refleksi yang jujur = langkah cepat menuju paham.</p>'+
+    '<div class="widget" data-w="refleksi"></div>';
+}
+function penutupHTML(){
+  return '<div class="thanks">'+
+    '<div class="emojis">&#127881;&#128218;&#10024;</div>'+
+    '<h2>Thank You for Today!</h2>'+
+    '<p class="lead" style="margin:0 auto 8px">Terima kasih sudah aktif menjelajah 10 materi matriks hari ini &mdash; dari definisi sampai transpose. Kalian sudah menjawab 110 soal! Sekarang kalian punya fondasi yang kuat untuk operasi matriks yang lebih seru.</p>'+
+    '</div>'+
+    '<div class="card concept" style="border-left-color:#5E60CE"><h3 style="color:#5E60CE">What&rsquo;s Next? &mdash; Perkalian Dua Matriks</h3>'+
+    '<p>Pertemuan berikutnya kita naik level: mengalikan <b>matriks dengan matriks</b>. Intinya sederhana: <b>baris &times; kolom</b> (baris dot kolom). Coba pratinjaunya di bawah!</p>'+
+    '<div class="widget" data-w="dot"></div>'+
+    '<p class="muted small">Mengapa harus dipelajari? Karena perkalian matriks adalah "mesin" di balik grafis 3D, jaringan saraf tiruan (AI), hingga perhitungan page rank mesin pencari.</p></div>'+
+    '<div class="note tahu"><b>Sebelum pertemuan berikutnya</b><br>1) Ulangi latihan yang masih salah hari ini. 2) Hafalkan: penjumlahan = seletak, skalar = semua elemen, transpose = baris jadi kolom. 3) Bawa semangat &mdash; perkalian dua matriks butuh ketelitian, bukan keberuntungan.</div>';
+}
+
+/* ---------- navigasi & menu ---------- */
+var stage=document.getElementById('stage'),idx=0;
+var S={score:{}};
+
+function go(i){
+  idx=Math.max(0,Math.min(SLIDES.length-1,i));
+  var s=SLIDES[idx];
+  var h='<section class="slide" style="--ac:'+s.ac+'">';
+  if(s.kicker)h+='<span class="kicker">'+s.kicker+'</span>';
+  if(s.title)h+='<h2 class="stitle">'+s.title+'</h2>';
+  h+=s.html+'</section>';
+  stage.innerHTML=h;
+  window.scrollTo(0,0);
+  stage.querySelectorAll('[data-w]').forEach(function(el){var f=WIDGETS[el.dataset.w];if(f)f(el);});
+  stage.querySelectorAll('[data-quiz]').forEach(function(el){mountQuiz(el,el.dataset.quiz,QUIZ[el.dataset.quiz]);});
+  stage.querySelectorAll('[data-steps]').forEach(function(el){mountSteps(el,CONTOH[el.dataset.steps]);});
+  document.getElementById('pfill').style.width=((idx+1)/SLIDES.length*100)+'%';
+  document.getElementById('counter').textContent=(idx+1)+' / '+SLIDES.length;
+  document.getElementById('prevBtn').disabled=(idx===0);
+  document.getElementById('nextBtn').disabled=(idx===SLIDES.length-1);
+  updateMenu();
+}
+
+function stripTags(s){var d=document.createElement('div');d.innerHTML=s;return d.textContent;}
+function buildMenu(){
+  var ml=document.getElementById('menulist'),lastG=null,h='';
+  SLIDES.forEach(function(s,i){
+    if(s.grp!==lastG){h+='<div class="mgroup">'+s.grp+'</div>';lastG=s.grp;}
+    h+='<button class="mitem" data-go="'+i+'"><span class="mnum">'+(i+1)+'</span><span>'+(s.title?stripTags(s.title):(s.plain?'Cover':'Slide '+(i+1)))+'</span></button>';
+  });
+  ml.innerHTML=h;
+  ml.querySelectorAll('[data-go]').forEach(function(b){
+    b.addEventListener('click',function(){closeMenu();go(+b.dataset.go);});
+  });
+}
+function updateMenu(){
+  document.querySelectorAll('.mitem').forEach(function(b){
+    b.classList.toggle('active',+b.dataset.go===idx);
+  });
+}
+function openMenu(){document.getElementById('menu').classList.add('open');document.getElementById('scrim').classList.add('show');}
+function closeMenu(){document.getElementById('menu').classList.remove('open');document.getElementById('scrim').classList.remove('show');}
+
+document.getElementById('menuBtn').addEventListener('click',openMenu);
+document.getElementById('menuClose').addEventListener('click',closeMenu);
+document.getElementById('scrim').addEventListener('click',closeMenu);
+document.getElementById('prevBtn').addEventListener('click',function(){go(idx-1);});
+document.getElementById('nextBtn').addEventListener('click',function(){go(idx+1);});
+document.addEventListener('keydown',function(e){
+  var t=e.target.tagName;
+  if(t==='INPUT'||t==='TEXTAREA')return;
+  if(e.key==='ArrowRight')go(idx+1);
+  if(e.key==='ArrowLeft')go(idx-1);
+  if(e.key==='Escape')closeMenu();
+});
+
+buildMenu();
+go(0);
+</script>
+</body>
+</html>
