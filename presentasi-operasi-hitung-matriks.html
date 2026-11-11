@@ -1,0 +1,982 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Presentasi Interaktif: Operasi Hitung Matriks — Matematika Kelas XI (Kurikulum Merdeka)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#FAF8F4; --surface:#FFFFFF; --ink:#1E3A5F; --ink2:#52627A;
+  --line:#E7E1D6; --soft:#F3EFE7; --navy:#1E3A5F;
+  --ok:#2E9E5B; --okbg:#EAF7EF; --bad:#C94F4F; --badbg:#FBEEEE;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{background:var(--bg);color:var(--ink);font-family:'Inter','Segoe UI',system-ui,-apple-system,Roboto,sans-serif;font-size:16.5px;line-height:1.65;-webkit-font-smoothing:antialiased}
+h1,h2,h3,h4{font-family:'Poppins','Inter','Segoe UI',sans-serif;margin:0 0 .5em;line-height:1.25}
+p{margin:.4em 0}
+b,strong{font-weight:700}
+button{font-family:inherit}
+#app{min-height:100dvh;display:flex;flex-direction:column}
+
+/* ---------- top bar ---------- */
+.topbar{display:flex;align-items:center;gap:14px;padding:12px 18px;border-bottom:1px solid var(--line);background:var(--surface);position:sticky;top:0;z-index:30}
+.iconbtn{border:1.5px solid var(--line);background:#fff;border-radius:10px;width:40px;height:40px;font-size:19px;cursor:pointer;color:var(--ink);flex:none}
+.iconbtn:hover{border-color:var(--navy);background:var(--soft)}
+.pwrap{flex:1;height:9px;background:#ECE6DA;border-radius:99px;overflow:hidden}
+#pfill{height:100%;width:0%;background:var(--navy);border-radius:99px;transition:width .25s ease}
+.counter{font-weight:700;font-size:14.5px;color:var(--ink2);font-variant-numeric:tabular-nums;flex:none}
+
+/* ---------- stage ---------- */
+#stage{flex:1;width:100%;max-width:1100px;margin:0 auto;padding:30px 26px 130px;overflow:visible}
+.slide{max-width:1060px;margin:0 auto}
+.kicker{display:inline-block;font-size:12.5px;font-weight:800;letter-spacing:.18em;text-transform:uppercase;color:var(--ac,var(--navy));background:color-mix(in srgb,var(--ac,var(--navy)) 10%,#fff);border:1px solid color-mix(in srgb,var(--ac,var(--navy)) 25%,#fff);padding:5px 12px;border-radius:99px;margin-bottom:14px}
+h2.stitle{font-size:clamp(26px,3.4vw,38px);font-weight:800;color:var(--ink)}
+h2.stitle::after{content:"";display:block;width:74px;height:5px;border-radius:99px;background:var(--ac,var(--navy));margin-top:10px}
+.lead{font-size:17.5px;color:var(--ink2);max-width:820px}
+.muted{color:var(--ink2);font-size:14.5px}
+.small{font-size:14px}
+
+/* ---------- cards & boxes ---------- */
+.card{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:20px 22px;margin:14px 0;box-shadow:0 1px 3px rgba(30,58,95,.05)}
+.card h3{font-size:18px;color:var(--ac,var(--navy));display:flex;align-items:center;gap:8px}
+.card h3::before{content:"";width:9px;height:9px;border-radius:3px;background:var(--ac,var(--navy));flex:none}
+.concept{border-left:6px solid var(--ac,var(--navy))}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+@media(max-width:760px){.grid2,.grid3{grid-template-columns:1fr}}
+.note{border-radius:12px;padding:13px 16px;margin:13px 0;font-size:15px;border:1px solid}
+.note b{display:block;margin-bottom:3px;font-family:'Poppins',sans-serif;font-size:14.5px}
+.note.awas{background:#FDF3E7;border-color:#F0DCBB;color:#7A5217}
+.note.tahu{background:#EAF4FB;border-color:#CBE2F4;color:#1E4E79}
+.note.sukses{background:var(--okbg);border-color:#CBE8D6;color:#1F6B3D}
+.k{display:inline-block;background:var(--soft);border:1px solid var(--line);border-radius:8px;padding:1px 9px;font-weight:700;font-size:.92em}
+.chips{display:flex;flex-wrap:wrap;gap:9px;margin:12px 0}
+.chip{background:#fff;border:1.5px solid color-mix(in srgb,var(--ac,var(--navy)) 35%,#fff);color:var(--ink);border-radius:99px;padding:6px 14px;font-size:14px;font-weight:600}
+ol.steps{margin:.3em 0 .2em;padding-left:1.35em}
+ol.steps li{margin:.45em 0}
+ul.tight{margin:.3em 0;padding-left:1.3em}
+ul.tight li{margin:.4em 0}
+
+/* ---------- matrix rendering ---------- */
+.mtx{display:inline-flex;align-items:stretch;margin:4px 3px;vertical-align:middle;color:var(--ink)}
+.mtx-l,.mtx-r{width:8px;flex:none;position:relative}
+.mtx-l{border:2.2px solid #3A5578;border-right:none;border-radius:4px 0 0 4px}
+.mtx-r{border:2.2px solid #3A5578;border-left:none;border-radius:0 4px 4px 0}
+.mtx-g{display:grid;gap:3px 18px;padding:5px 7px;align-items:center;justify-items:center;font-variant-numeric:tabular-nums;font-weight:600}
+.mc{min-width:20px;text-align:center;padding:1px 4px;border-radius:5px;white-space:nowrap}
+.mtx.big .mc{font-size:1.3rem;padding:3px 7px;min-width:30px}
+.mtx.big .mtx-g{gap:6px 26px}
+.mtx .mc.hl{background:color-mix(in srgb,var(--ac,#2D7DD2) 16%,#fff);box-shadow:inset 0 0 0 1.8px var(--ac,#2D7DD2)}
+.mtx .mc.dim{color:#B9B2A4}
+.mtx .mc.r0{background:#EAF2FD}.mtx .mc.r1{background:#FDF0E4}.mtx .mc.r2{background:#EBF7F1}
+.mtx .mc.pick{background:#FFF3C9;box-shadow:inset 0 0 0 2px #D9A400}
+.mtx .mc.twin{background:#F3EAFD;box-shadow:inset 0 0 0 1.8px #7C5CBF}
+.frac{display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;font-size:.82em;line-height:1.15;margin:0 2px}
+.frac>span:first-child{border-bottom:1.6px solid currentColor;padding:0 4px}
+sub,sup{line-height:0}
+
+/* ---------- interactive widgets ---------- */
+.widget{margin:18px 0}
+.wbox{background:var(--surface);border:2px solid color-mix(in srgb,var(--ac,var(--navy)) 30%,#fff);border-radius:18px;padding:20px 22px}
+.wbox h4{color:var(--ac,var(--navy));font-size:16.5px;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.wrow{display:flex;flex-wrap:wrap;gap:22px;align-items:flex-start}
+.winfo{flex:1;min-width:250px;background:var(--soft);border-radius:12px;padding:14px 16px;font-size:15px;min-height:96px}
+.winfo b{color:var(--ac,var(--navy))}
+.wcell{cursor:pointer;border:none;background:transparent;font:inherit;font-weight:600;border-radius:6px;transition:background .15s}
+.wcell:hover{background:color-mix(in srgb,var(--ac,#2D7DD2) 14%,#fff)}
+.mtx .mc.bcell{cursor:pointer}
+.btn{background:var(--ac,var(--navy));color:#fff;border:none;border-radius:11px;padding:10px 18px;font-weight:700;font-size:15px;cursor:pointer;transition:transform .1s,filter .15s}
+.btn:hover{filter:brightness(1.1)}
+.btn:active{transform:scale(.97)}
+.btn.ghost{background:#fff;color:var(--ac,var(--navy));border:1.8px solid var(--ac,var(--navy))}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.stepper{display:inline-flex;align-items:center;gap:6px}
+.stepper button{width:26px;height:26px;border-radius:8px;border:1.5px solid var(--line);background:#fff;font-weight:800;cursor:pointer;color:var(--ink);line-height:1}
+.stepper button:hover{border-color:var(--ac,var(--navy));color:var(--ac,var(--navy))}
+.pills{display:flex;flex-wrap:wrap;gap:9px;margin:10px 0}
+.pill{border:1.8px solid var(--line);background:#fff;border-radius:99px;padding:7px 15px;font-weight:600;font-size:14px;cursor:pointer;color:var(--ink)}
+.pill:hover{border-color:var(--ac,var(--navy))}
+.pill.on{background:var(--ac,var(--navy));border-color:var(--ac,var(--navy));color:#fff}
+.slider{-webkit-appearance:none;appearance:none;width:100%;max-width:340px;height:8px;border-radius:99px;background:#E4DECF;outline:none;margin:12px 0}
+.slider::-webkit-slider-thumb{-webkit-appearance:none;width:24px;height:24px;border-radius:50%;background:var(--ac,var(--navy));cursor:pointer;border:3px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.25)}
+.slider::-moz-range-thumb{width:22px;height:22px;border-radius:50%;background:var(--ac,var(--navy));cursor:pointer;border:3px solid #fff}
+.kv{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.tag{display:inline-block;background:color-mix(in srgb,var(--ac,var(--navy)) 12%,#fff);color:var(--ac,var(--navy));font-weight:700;border-radius:8px;padding:2px 10px;font-size:13.5px}
+.gallery{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:12px 0}
+@media(max-width:760px){.gallery{grid-template-columns:repeat(2,1fr)}}
+.gcard{border:2px solid var(--line);border-radius:14px;background:#fff;padding:14px 12px;text-align:center;cursor:pointer;transition:all .15s}
+.gcard:hover{transform:translateY(-2px);border-color:var(--ac,var(--navy))}
+.gcard.on{border-color:var(--ac,var(--navy));background:color-mix(in srgb,var(--ac,var(--navy)) 7%,#fff);box-shadow:0 3px 10px color-mix(in srgb,var(--ac,var(--navy)) 15%,transparent)}
+.gcard b{display:block;font-size:15px;margin-bottom:2px}
+.gcard span{font-size:12.5px;color:var(--ink2)}
+.wex{display:flex;gap:20px;align-items:center;flex-wrap:wrap;background:var(--soft);border-radius:12px;padding:14px 16px;margin-top:12px}
+
+/* ---------- contoh soal & langkah ---------- */
+.ccard{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:20px 22px;margin:16px 0;box-shadow:0 1px 3px rgba(30,58,95,.05)}
+.ccard .cq{background:var(--soft);border-radius:12px;padding:13px 16px;margin-bottom:12px}
+.ccard .cq b{color:var(--ac,var(--navy))}
+.stepitem{display:none;border-left:4px solid var(--ac,var(--navy));background:#fff;border-radius:0 10px 10px 0;padding:10px 14px;margin:9px 0;animation:pop .25s ease}
+.stepitem.show{display:block}
+@keyframes pop{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.answerbox{display:none;margin-top:12px;background:var(--okbg);border:1.5px solid #BFE3CD;border-radius:12px;padding:12px 16px}
+.answerbox.show{display:block}
+.answerbox b{color:var(--ok)}
+
+/* ---------- quiz ---------- */
+.quizhead{display:flex;flex-wrap:wrap;align-items:center;gap:12px;justify-content:space-between;background:var(--ac,var(--navy));color:#fff;border-radius:14px;padding:13px 18px;margin:16px 0 6px}
+.quizhead b{font-family:'Poppins',sans-serif;font-size:16.5px}
+.qscore{background:rgba(255,255,255,.16);border-radius:99px;padding:5px 14px;font-size:13.5px;font-weight:700;font-variant-numeric:tabular-nums}
+.qcard{background:var(--surface);border:1px solid var(--line);border-radius:15px;padding:17px 19px;margin:13px 0;box-shadow:0 1px 3px rgba(30,58,95,.05)}
+.qtop{display:flex;align-items:center;gap:10px;margin-bottom:8px;flex-wrap:wrap}
+.qnum{background:color-mix(in srgb,var(--ac,var(--navy)) 12%,#fff);color:var(--ac,var(--navy));font-weight:800;font-size:13px;border-radius:8px;padding:3px 11px}
+.qtype{font-size:12px;color:var(--ink2);border:1px solid var(--line);border-radius:99px;padding:2px 10px}
+.qbadge{margin-left:auto;font-weight:800;font-size:13.5px}
+.qbadge.ok{color:var(--ok)}.qbadge.bad{color:var(--bad)}
+.qtext{margin:4px 0 12px}
+.opts{display:grid;gap:9px}
+.opt{text-align:left;background:#FCFBF8;border:1.8px solid var(--line);border-radius:11px;padding:10px 14px;font-size:15px;cursor:pointer;color:var(--ink);transition:all .12s;display:flex;gap:10px;align-items:center}
+.opt .ol{font-weight:800;color:var(--ink2);flex:none}
+.opt:hover{border-color:var(--ac,var(--navy))}
+.opt.sel{border-color:var(--ac,var(--navy));background:color-mix(in srgb,var(--ac,var(--navy)) 7%,#fff)}
+.opt.right{border-color:var(--ok);background:var(--okbg)}
+.opt.wrong{border-color:var(--bad);background:var(--badbg)}
+.opt:disabled{cursor:default;opacity:.92}
+.qinput{width:100%;max-width:340px;border:1.8px solid var(--line);border-radius:11px;padding:10px 14px;font:inherit;font-weight:600;color:var(--ink);background:#FCFBF8;outline:none}
+.qinput:focus{border-color:var(--ac,var(--navy));background:#fff}
+.qinput:disabled{background:#F2EEE6}
+.qbtns{display:flex;gap:10px;margin-top:12px;flex-wrap:wrap}
+.feed{display:none;margin-top:11px;border-radius:11px;padding:10px 14px;font-weight:600;font-size:14.5px}
+.feed.show{display:block}
+.feed.good{background:var(--okbg);color:#1F6B3D;border:1px solid #CBE8D6}
+.feed.badd{background:var(--badbg);color:#8F3030;border:1px solid #F0C9C9}
+.sol{display:none;margin-top:11px;background:var(--soft);border-left:4px solid var(--ac,var(--navy));border-radius:0 11px 11px 0;padding:11px 15px;font-size:14.8px}
+.sol.show{display:block}
+.sol b{color:var(--ac,var(--navy))}
+.shake{animation:shake .3s}
+@keyframes shake{25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
+
+/* ---------- bottom nav & menu ---------- */
+.bottomnav{position:fixed;left:0;right:0;bottom:0;display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 16px;background:linear-gradient(to top,var(--bg) 65%,transparent);z-index:25;pointer-events:none}
+.navbtn{pointer-events:auto;background:var(--navy);color:#fff;border:none;border-radius:12px;padding:12px 20px;font-weight:700;font-size:15px;cursor:pointer;box-shadow:0 3px 10px rgba(30,58,95,.25)}
+.navbtn:hover:not(:disabled){filter:brightness(1.15)}
+.navbtn:disabled{opacity:.35;cursor:not-allowed;box-shadow:none}
+.keyhint{pointer-events:none;font-size:12.5px;color:var(--ink2);background:rgba(255,255,255,.85);border:1px solid var(--line);border-radius:99px;padding:5px 13px}
+@media(max-width:640px){.keyhint{display:none}.navbtn{padding:11px 14px;font-size:13.5px}}
+.menu{position:fixed;top:0;right:-360px;width:340px;max-width:88vw;height:100dvh;background:var(--surface);box-shadow:-8px 0 30px rgba(30,58,95,.18);z-index:60;transition:right .28s ease;display:flex;flex-direction:column}
+.menu.open{right:0}
+.menuhead{display:flex;justify-content:space-between;align-items:center;padding:16px 18px;border-bottom:1px solid var(--line)}
+.menuhead b{font-family:'Poppins',sans-serif;font-size:17px}
+.menulist{overflow-y:auto;padding:10px 14px 30px;flex:1}
+.mgroup{font-size:11.5px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--ink2);margin:16px 4px 6px}
+.mitem{display:flex;gap:10px;align-items:center;width:100%;text-align:left;background:none;border:none;border-radius:10px;padding:8px 10px;cursor:pointer;font-size:14.3px;color:var(--ink)}
+.mitem:hover{background:var(--soft)}
+.mitem .mnum{flex:none;width:26px;height:26px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;background:var(--soft);color:var(--ink2)}
+.mitem.active{background:color-mix(in srgb,var(--navy) 10%,#fff);font-weight:700}
+.mitem.active .mnum{background:var(--navy);color:#fff}
+.scrim{position:fixed;inset:0;background:rgba(20,35,60,.35);opacity:0;pointer-events:none;transition:opacity .25s;z-index:50}
+.scrim.show{opacity:1;pointer-events:auto}
+
+/* ---------- cover & closing ---------- */
+.cover{display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;min-height:72vh;gap:6px}
+.cover .sub{font-size:15px;font-weight:700;letter-spacing:.3em;text-transform:uppercase;color:var(--ac,var(--navy))}
+.cover h1{font-size:clamp(56px,11vw,110px);font-weight:800;letter-spacing:.06em;color:var(--ink);margin:.05em 0;line-height:1}
+.cover .desc{font-size:17.5px;color:var(--ink2);max-width:560px}
+.covermtx{margin:26px 0 10px;animation:float 5s ease-in-out infinite}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-9px)}}
+.topicgrid{display:grid;grid-template-columns:repeat(5,1fr);gap:9px;margin-top:22px;max-width:860px}
+@media(max-width:760px){.topicgrid{grid-template-columns:repeat(2,1fr)}}
+.tchip{background:#fff;border:1.5px solid var(--line);border-radius:11px;padding:9px 8px;font-size:12.8px;font-weight:600;color:var(--ink2)}
+.tchip b{display:block;color:var(--ink);font-size:13.2px}
+.bignum{font-size:34px;font-weight:800;font-family:'Poppins',sans-serif;color:var(--ac,var(--navy))}
+.summary{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+@media(max-width:760px){.summary{grid-template-columns:1fr}}
+.scard{background:#fff;border:1px solid var(--line);border-left:5px solid var(--sc,var(--navy));border-radius:13px;padding:13px 16px}
+.scard b{font-size:14.8px}
+.scard p{font-size:13.8px;color:var(--ink2);margin:3px 0 0}
+.thanks{text-align:center;padding:40px 10px 20px}
+.thanks h2{font-size:clamp(34px,5.5vw,54px)}
+.emojis{font-size:34px;letter-spacing:10px;margin:8px 0 2px}
+.rate{display:flex;gap:12px;justify-content:flex-start;flex-wrap:wrap;margin:8px 0 4px}
+.rate button{font-size:30px;background:#fff;border:2px solid var(--line);border-radius:14px;width:62px;height:62px;cursor:pointer;transition:all .12s}
+.rate button:hover{transform:translateY(-3px)}
+.rate button.on{border-color:var(--ac,var(--navy));background:color-mix(in srgb,var(--ac,var(--navy)) 10%,#fff)}
+.checks{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin:10px 0}
+@media(max-width:640px){.checks{grid-template-columns:1fr}}
+.checks label{display:flex;gap:9px;align-items:center;font-size:14.3px;background:#fff;border:1px solid var(--line);border-radius:10px;padding:8px 12px;cursor:pointer}
+textarea.ref{width:100%;min-height:84px;border:1.8px solid var(--line);border-radius:12px;padding:12px 14px;font:inherit;resize:vertical;outline:none;background:#FCFBF8}
+textarea.ref:focus{border-color:var(--ac,var(--navy))}
+.divider{height:1px;background:var(--line);margin:22px 0}
+</style>
+</head>
+<body>
+<div id="app">
+  <header class="topbar">
+    <button id="menuBtn" class="iconbtn" title="Daftar slide (menu)">&#9776;</button>
+    <div class="pwrap"><div id="pfill"></div></div>
+    <span id="counter" class="counter">1 / 1</span>
+  </header>
+  <main id="stage"></main>
+  <nav class="bottomnav">
+    <button id="prevBtn" class="navbtn">&#8592; Sebelumnya</button>
+    <span class="keyhint">Gunakan tombol &#8592; &#8594; pada keyboard untuk berpindah slide</span>
+    <button id="nextBtn" class="navbtn">Berikutnya &#8594;</button>
+  </nav>
+  <aside id="menu" class="menu">
+    <div class="menuhead"><b>Daftar Slide</b><button id="menuClose" class="iconbtn" title="Tutup">&times;</button></div>
+    <div id="menulist" class="menulist"></div>
+  </aside>
+  <div id="scrim" class="scrim"></div>
+</div>
+<script>
+/* ================= HELPER RENDERING & OPERASI MATRIKS ================= */
+var QUIZ={};
+function mx(d,o){
+  o=o||{};
+  var r=d.length,c=d[0].length,i,j,cls='mtx'+(o.big?' big':''),cells='';
+  for(i=0;i<r;i++){
+    for(j=0;j<c;j++){
+      var hcl='';
+      if(o.hl){
+        if(o.hl(i,j)) hcl=' '+(o.hlclass||'hl');
+      }
+      var cell=o.cells&&o.cells(i,j);
+      cells+='<span class="mc'+hcl+(cell?' '+cell:'')+'" data-i="'+i+'" data-j="'+j+'">'+d[i][j]+'</span>';
+    }
+  }
+  return '<span class="'+cls+'"><span class="mtx-l"></span><span class="mtx-g" style="grid-template-columns:repeat('+c+',auto)">'+cells+'</span><span class="mtx-r"></span></span>';
+}
+function sub2(i,j){return '<sub>'+i+j+'</sub>';}
+function frac(p,q){
+  var neg=(p<0)!==(q<0); p=Math.abs(p); q=Math.abs(q);
+  var g=function(a,b){return b?g(b,a%b):a;}, gg=g(p,q)||1; p/=gg; q/=gg;
+  if(q===1) return (neg?'&minus;':'')+p;
+  return (neg?'&minus;':'')+'<span class="frac"><span>'+p+'</span><span>'+q+'</span></span>';
+}
+function norm(s){
+  return String(s).toLowerCase().replace(/[\s,\.]/g,'').replace(/\u00d7/g,'x').replace(/\u2212/g,'-').replace(/\u2013/g,'-');
+}
+function checkInput(val,acc){
+  var v=norm(val); if(!v) return false;
+  if(typeof acc==='string') acc=[acc];
+  return acc.some(function(a){return norm(a)===v;});
+}
+function steppersHTML(id,r,c,mat){
+  var h='<span class="mtx big" data-st="'+id+'"><span class="mtx-l"></span><span class="mtx-g" style="grid-template-columns:repeat('+c+',auto)">';
+  for(var i=0;i<r;i++)for(var j=0;j<c;j++)
+    h+='<span class="stepper mc"><button class="sdec" data-i="'+i+'" data-j="'+j+'">&minus;</button><b class="sv">'+mat[i][j]+'</b><button class="sinc" data-i="'+i+'" data-j="'+j+'">+</button></span>';
+  return h+'</span><span class="mtx-r"></span></span>';
+}
+function clamp9(v){return Math.max(-9,Math.min(9,v));}
+function par(v){return v<0?'('+v+')':String(v);}
+
+/* ---------- operasi matriks (sumber kebenaran aritmetika) ---------- */
+function madd(A,B){
+  var R=[];for(var i=0;i<A.length;i++){var r=[];for(var j=0;j<A[0].length;j++)r.push(A[i][j]+B[i][j]);R.push(r);}return R;
+}
+function msub(A,B){
+  var R=[];for(var i=0;i<A.length;i++){var r=[];for(var j=0;j<A[0].length;j++)r.push(A[i][j]-B[i][j]);R.push(r);}return R;
+}
+function smul(k,A){
+  return A.map(function(row){return row.map(function(v){return k*v;});});
+}
+function mmul(A,B){
+  var R=[];for(var i=0;i<A.length;i++){var r=[];for(var j=0;j<B[0].length;j++){
+    var s=0;for(var t=0;t<B.length;t++)s+=A[i][t]*B[t][j];r.push(s);}R.push(r);}return R;
+}
+function ordo(A){return A.length+'\u00d7'+A[0].length;}
+/* ================= WIDGETS INTERAKTIF ================= */
+var WIDGETS={};
+function aij(i,j){return 'a<sub>'+i+j+'</sub>';}
+
+/* W1: Detektif kesamaan dua matriks (bekal) */
+WIDGETS.kesamaan=function(el){
+  var A=[[3,4],[1,2]], B=[[3,4],[1,5]];
+  function same(){
+    for(var i=0;i<2;i++)for(var j=0;j<2;j++)if(A[i][j]!==B[i][j])return false;
+    return true;
+  }
+  function diffs(){
+    var d=[];
+    for(var i=0;i<2;i++)for(var j=0;j<2;j++)if(A[i][j]!==B[i][j])d.push([i,j]);
+    return d;
+  }
+  function render(){
+    var df=diffs(),ok=same();
+    el.innerHTML='<div class="wbox"><h4>Detektif Kesamaan: A = B ?</h4><div class="wrow">'+
+      '<div style="text-align:center">'+mx(A,{big:1})+'<p class="muted small">Matriks A (tetap)</p></div>'+
+      '<div style="font-size:34px;align-self:center;font-weight:800;color:'+(ok?'var(--ok)':'var(--bad)')+'">'+(ok?'=':'&ne;')+'</div>'+
+      '<div style="text-align:center">'+steppersHTML('kb',2,2,B)+'<p class="muted small">Matriks B (atur dengan &plusmn;)</p></div>'+
+      '<div class="winfo" id="wks-info"></div></div>'+
+      '<p class="muted small" style="margin-top:10px">Cek otomatis: ordo sama (2&times;2 = 2&times;2) &check; lalu bandingkan elemen seletak.</p></div>';
+    var info=el.querySelector('#wks-info');
+    if(ok){
+      info.innerHTML='<b style="color:var(--ok)">SAMA! A = B</b><br>Kedua syarat terpenuhi: ordonya sama dan semua elemen seletak bernilai sama.<br>'+aij(2,2)+'(A) = 2 dan '+aij(2,2)+'(B) = 2 &check;';
+    }else{
+      var r=df.map(function(p){return aij(p[0]+1,p[1]+1)+': A = '+A[p[0]][p[1]]+' sedangkan B = <b>'+B[p[0]][p[1]]+'</b>';}).join('<br>');
+      info.innerHTML='<b style="color:var(--bad)">BELUM SAMA</b><br>Elemen yang berbeda:<br>'+r+'<br><span class="muted small">Perbaiki lewat tombol &plusmn; hingga status berubah.</span>';
+    }
+    el.querySelectorAll('.sdec,.sinc').forEach(function(b){
+      b.addEventListener('click',function(){
+        var i=+b.dataset.i,j=+b.dataset.j;
+        B[i][j]=clamp9(B[i][j]+(b.className.indexOf('sinc')>-1?1:-1));
+        render();
+      });
+    });
+  }
+  render();
+};
+
+/* W2: Kalkulator penjumlahan */
+WIDGETS.jumlah=function(el){
+  var A=[[2,-1],[3,4]],B=[[5,0],[-2,1]],last=[0,0];
+  function render(){
+    var C=madd(A,B);
+    el.innerHTML='<div class="wbox"><h4>Kalkulator A + B (atur angkanya!)</h4><div class="wrow">'+
+      '<div style="text-align:center">'+steppersHTML('ja',2,2,A)+'<p class="muted small">A</p></div>'+
+      '<div style="font-size:30px;align-self:center;font-weight:800">+</div>'+
+      '<div style="text-align:center">'+steppersHTML('jb',2,2,B)+'<p class="muted small">B</p></div>'+
+      '<div style="font-size:30px;align-self:center;font-weight:800">=</div>'+
+      '<div style="text-align:center">'+mx(C,{big:1,hl:function(i,j){return i===last[0]&&j===last[1];}})+'<p class="muted small">A + B (otomatis)</p></div>'+
+      '<div class="winfo" id="wjm-info"></div></div>'+
+      '<p class="muted small" style="margin-top:10px">Sifat: A + B = B + A (komutatif) &middot; A + O = A &middot; A + (&minus;A) = O</p></div>';
+    var li=last[0],lj=last[1];
+    el.querySelector('#wjm-info').innerHTML='<b>Cara menghitung elemen yang disorot:</b><br>'+
+      'c'+sub2(li+1,lj+1)+' = a'+sub2(li+1,lj+1)+' + b'+sub2(li+1,lj+1)+'<br>= '+par(A[li][lj])+' + '+par(B[li][lj])+' = <b>'+C[li][lj]+'</b><br>'+
+      '<span class="muted small">Setiap elemen hasil = jumlah elemen A dan B yang SELETAK.</span>';
+    el.querySelectorAll('.sdec,.sinc').forEach(function(b){
+      b.addEventListener('click',function(){
+        var i=+b.dataset.i,j=+b.dataset.j,d=(b.className.indexOf('sinc')>-1?1:-1);
+        if(b.closest('[data-st="ja"]'))A[i][j]=clamp9(A[i][j]+d); else B[i][j]=clamp9(B[i][j]+d);
+        last=[i,j]; render();
+      });
+    });
+  }
+  render();
+};
+
+/* W3: Kalkulator pengurangan + toggle A−B / B−A */
+WIDGETS.kurang=function(el){
+  var A=[[7,2],[-3,5]],B=[[4,6],[1,-2]],mode='AB',last=[0,0];
+  function render(){
+    var C=(mode==='AB')?msub(A,B):msub(B,A);
+    var lbl=mode==='AB'?'A &minus; B':'B &minus; A';
+    el.innerHTML='<div class="wbox"><h4>Kalkulator Pengurangan</h4>'+
+      '<div class="pills"><button class="pill'+(mode==='AB'?' on':'')+'" data-m="AB">A &minus; B</button><button class="pill'+(mode==='BA'?' on':'')+'" data-m="BA">B &minus; A</button></div>'+
+      '<div class="wrow">'+
+      '<div style="text-align:center">'+steppersHTML('ka',2,2,A)+'<p class="muted small">A</p></div>'+
+      '<div style="font-size:30px;align-self:center;font-weight:800">&minus;</div>'+
+      '<div style="text-align:center">'+steppersHTML('kb2',2,2,B)+'<p class="muted small">B</p></div>'+
+      '<div style="font-size:30px;align-self:center;font-weight:800">=</div>'+
+      '<div style="text-align:center">'+mx(C,{big:1,hl:function(i,j){return i===last[0]&&j===last[1];}})+'<p class="muted small">'+lbl+'</p></div>'+
+      '<div class="winfo" id="wkq-info"></div></div>'+
+      '<p class="muted small" style="margin-top:10px">Awas: pengurangan TIDAK komutatif. Coba toggle B &minus; A: hasilnya berlawanan tanda dengan A &minus; B, karena B &minus; A = &minus;(A &minus; B).</p></div>';
+    var li=last[0],lj=last[1],x=mode==='AB'?A[li][lj]:B[li][lj],y=mode==='AB'?B[li][lj]:A[li][lj];
+    el.querySelector('#wkq-info').innerHTML='<b>Elemen yang disorot:</b><br>'+
+      (mode==='AB'?'c'+sub2(li+1,lj+1)+' = a'+sub2(li+1,lj+1)+' &minus; b'+sub2(li+1,lj+1):'c'+sub2(li+1,lj+1)+' = b'+sub2(li+1,lj+1)+' &minus; a'+sub2(li+1,lj+1))+
+      '<br>= '+x+' &minus; '+par(y)+' = '+x+' + '+par(-y)+' = <b>'+C[li][lj]+'</b>';
+    el.querySelectorAll('[data-m]').forEach(function(b){
+      b.addEventListener('click',function(){mode=b.dataset.m;render();});
+    });
+    el.querySelectorAll('.sdec,.sinc').forEach(function(b){
+      b.addEventListener('click',function(){
+        var i=+b.dataset.i,j=+b.dataset.j,d=(b.className.indexOf('sinc')>-1?1:-1);
+        if(b.closest('[data-st="ka"]'))A[i][j]=clamp9(A[i][j]+d); else B[i][j]=clamp9(B[i][j]+d);
+        last=[i,j]; render();
+      });
+    });
+  }
+  render();
+};
+
+/* W4: Perkalian skalar dengan slider */
+WIDGETS.skalar=function(el){
+  var A=[[3,-1],[2,5],[0,4]],k=2,pick=[0,0];
+  function render(){
+    var K=smul(k,A);
+    el.innerHTML='<div class="wbox"><h4>Mesin Skalar: k &times; A</h4>'+
+      '<div class="wrow"><div style="text-align:center">'+
+      mx(A,{big:1,cells:function(i,j){return (i===pick[0]&&j===pick[1])?'bcell pick':'bcell';}})+'<p class="muted small">A (klik satu elemen)</p></div>'+
+      '<div style="flex:1;min-width:230px"><div class="kv"><span class="tag" style="font-size:16px">k = '+k+'</span></div>'+
+      '<input type="range" class="slider" min="-5" max="5" step="1" value="'+k+'" id="wsk-k">'+
+      '<p class="muted small">Geser nilai k dari &minus;5 sampai 5.</p>'+
+      '<div class="winfo" id="wsk-info" style="min-height:auto"></div></div>'+
+      '<div style="text-align:center">'+mx(K,{big:1})+'<p class="muted small">k &times; A</p></div></div></div>';
+    var i=pick[0],j=pick[1];
+    el.querySelector('#wsk-info').innerHTML='Contoh elemen yang dipilih: a'+sub2(i+1,j+1)+' = '+A[i][j]+'.<br>'+
+      'Maka elemen hasil: <b>'+k+' &times; '+par(A[i][j])+' = '+(k*A[i][j])+'</b> &mdash; begitu pula semua elemen lain.<br>'+
+      '<span class="muted small">'+(k<0?'k negatif membalik tanda semua elemen.':'Setiap elemen dikali k, bentuk matriks tidak berubah.')+'</span>';
+    el.querySelector('#wsk-k').addEventListener('input',function(e){k=+e.target.value;render();});
+    el.querySelectorAll('.mc.bcell').forEach(function(c){
+      c.addEventListener('click',function(){pick=[+c.dataset.i,+c.dataset.j];render();});
+    });
+  }
+  render();
+};
+
+/* W5: Pembagian matriks dengan skalar + mitos/fakta */
+WIDGETS.bagi=function(el){
+  var A=[[12,-9],[6,3]],ks=[1,2,3,4,6,-2],k=2,myt=0;
+  var myths=[
+    {s:'"Matriks A boleh dibagi oleh matriks B, tulis saja A &divide; B."',benar:false,j:"MITOS. Pembagian antar dua matriks tidak didefinisikan. Penggantinya: kalikan dengan invers B<sup>&minus;1</sup> (dipelajari setelah materi ini)."},
+    {s:'"Membagi matriks dengan skalar 5 sama saja dengan mengalinya dengan 1/5."',benar:true,j:"FAKTA. A : 5 = (1/5)A &mdash; setiap elemen dibagi 5."},
+    {s:'"Matriks apa pun boleh dibagi dengan skalar 0."',benar:false,j:"MITOS. Pembagian oleh nol tidak terdefinisi, termasuk pada matriks."}
+  ];
+  function render(){
+    var K=A.map(function(row){return row.map(function(v){return frac(v,k);});});
+    var m=myths[myt];
+    el.innerHTML='<div class="wbox"><h4>Mesin Bagi Skalar A : k</h4>'+
+      '<div class="wrow"><div style="text-align:center">'+mx(A,{big:1})+'<p class="muted small">A</p></div>'+
+      '<div style="align-self:center"><div class="pills" style="flex-direction:column">'+ks.map(function(v){return '<button class="pill'+(v===k?' on':'')+'" data-k="'+v+'">k = '+v+'</button>';}).join('')+'</div></div>'+
+      '<div style="text-align:center">'+mx(K,{big:1})+'<p class="muted small">A : k &nbsp;(sama dengan <span class="frac"><span>1</span><span>'+Math.abs(k)+'</span></span>'+(k<0?'&times;(&minus;1)':'')+' &times; A)</p></div>'+
+      '<div class="winfo" style="min-height:auto"><b>Perhatikan:</b><br>Hasil bagi ditampilkan sebagai pecahan bila tidak habis dibagi. Semua elemen dibagi k dengan aturan yang sama.</div></div>'+
+      '<div class="divider"></div><b style="font-family:Poppins,sans-serif;font-size:15px;color:var(--ac,var(--navy))">Mitos atau Fakta? &mdash; putuskan sendiri lalu lihat penjelasannya</b>'+
+      '<div class="card" style="margin:10px 0"><p>'+m.s+'</p><div class="qbtns"><button class="btn ghost" data-my="1">FAKTA</button><button class="btn ghost" data-my="0">MITOS</button></div>'+
+      '<div class="feed" id="wbg-feed"></div></div></div>';
+    el.querySelectorAll('[data-k]').forEach(function(b){
+      b.addEventListener('click',function(){k=+b.dataset.k;render();});
+    });
+    el.querySelectorAll('[data-my]').forEach(function(b){
+      b.addEventListener('click',function(){
+        var f=el.querySelector('#wbg-feed'),benar=(b.dataset.my==='1');
+        f.className='feed show '+(benar===m.benar?'good':'badd');
+        f.innerHTML=(benar===m.benar?'Tepat! ':'Kurang tepat. ')+m.j;
+      });
+    });
+  }
+  render();
+};
+
+/* W6: Lab perkalian dua matriks — baris × kolom */
+WIDGETS.mulmat=function(el){
+  var A=[[2,0,1],[3,1,-1]],B=[[1,2],[0,1],[4,3]],sel=[0,0];
+  function render(){
+    var C=mmul(A,B),i=sel[0],j=sel[1];
+    var terms=[],k;
+    for(k=0;k<3;k++)terms.push(par(A[i][k])+'&middot;'+par(B[k][j]));
+    el.innerHTML='<div class="wbox"><h4>Laboratorium Perkalian: baris A &times; kolom B</h4>'+
+      '<div class="wrow">'+
+      '<div style="text-align:center">'+mx(A,{big:1,hl:function(r,c){return r===i;}})+'<p class="muted small">A (2&times;3) &mdash; baris ke-'+(i+1)+' disorot</p></div>'+
+      '<div style="font-size:30px;align-self:center;font-weight:800">&times;</div>'+
+      '<div style="text-align:center">'+mx(B,{big:1,hl:function(r,c){return c===j;},hlclass:'twin'})+'<p class="muted small">B (3&times;2) &mdash; kolom ke-'+(j+1)+' disorot</p></div>'+
+      '<div style="font-size:30px;align-self:center;font-weight:800">=</div>'+
+      '<div style="text-align:center">'+mx(C,{big:1,cells:function(r,c){return (r===i&&c===j)?'bcell pick':'bcell';}})+'<p class="muted small">C = A&times;B (klik selnya!)</p></div>'+
+      '<div class="winfo" id="wml-info"></div></div>'+
+      '<p class="muted small" style="margin-top:10px">Ordo A 2&times;3 dan ordo B 3&times;2 &rarr; kolom A (3) = baris B (3) &rarr; perkalian TERDEFINISI, hasilnya 2&times;2.</p></div>';
+    el.querySelector('#wml-info').innerHTML='<b>Menghitung c'+sub2(i+1,j+1)+' (baris ke-'+(i+1)+' A, kolom ke-'+(j+1)+' B):</b><br>'+
+      'c'+sub2(i+1,j+1)+' = '+terms.join(' + ')+'<br>= '+terms.map(function(t,k){return A[i][k]*B[k][j];}).join(' + ')+' = <b>'+C[i][j]+'</b><br>'+
+      '<span class="muted small">Satu sel hasil = SATU baris A di-dot-kan dengan SATU kolom B, lalu dijumlahkan.</span>';
+    el.querySelectorAll('.mc.bcell').forEach(function(c){
+      c.addEventListener('click',function(){sel=[+c.dataset.i,+c.dataset.j];render();});
+    });
+  }
+  render();
+};
+
+/* W7: Refleksi diri */
+WIDGETS.refleksi=function(el){
+  var rate=0,topik=['Penjumlahan matriks','Pengurangan matriks','Perkalian skalar','Pembagian matriks','Perkalian dua matriks','Kesamaan matriks','Operasi campuran'];
+  el.innerHTML='<div class="wbox"><h4>Lembar Refleksi</h4>'+
+    '<b style="font-size:14.5px">1. Bagaimana perasaanmu setelah belajar hari ini?</b>'+
+    '<div class="rate">'+['&#128533;','&#128528;','&#128522;','&#129321;'].map(function(e,i){return '<button data-r="'+(i+1)+'" title="'+(i+1)+'">'+e+'</button>';}).join('')+'</div>'+
+    '<p class="muted small" id="wrf-rate">Belum dipilih</p>'+
+    '<b style="font-size:14.5px">2. Materi mana yang masih membingungkan? (boleh lebih dari satu)</b>'+
+    '<div class="checks">'+topik.map(function(t,i){return '<label><input type="checkbox" value="'+i+'"> '+t+'</label>';}).join('')+'</div>'+
+    '<b style="font-size:14.5px">3. Tuliskan satu hal menarik yang kamu pelajari hari ini:</b>'+
+    '<textarea class="ref" id="wrf-text" placeholder="Contoh: aku baru tahu kalau matriks tidak punya operasi pembagian antar matriks..."></textarea>'+
+    '<div class="qbtns"><button class="btn" id="wrf-send">Kirim Refleksi</button></div>'+
+    '<div class="feed" id="wrf-feed"></div></div>';
+  el.querySelectorAll('[data-r]').forEach(function(b){
+    b.addEventListener('click',function(){
+      el.querySelectorAll('[data-r]').forEach(function(x){x.classList.remove('on');});
+      b.classList.add('on'); rate=+b.dataset.r;
+      el.querySelector('#wrf-rate').innerHTML=['Masih bingung, perlu bantuan','Lumayan, ada yang harus diulang','Paham dengan baik','Sangat paham, siap lanjut!'][rate-1];
+    });
+  });
+  el.querySelector('#wrf-send').addEventListener('click',function(){
+    var ck=[].slice.call(el.querySelectorAll('.checks input:checked')).map(function(c){return topik[+c.value];});
+    var tx=el.querySelector('#wrf-text').value.trim();
+    if(!rate){var f=el.querySelector('#wrf-feed');f.className='feed show badd';f.innerHTML='Pilih dulu perasaanmu di nomor 1 ya!';return;}
+    el.querySelector('#wrf-feed').className='feed show good';
+    el.querySelector('#wrf-feed').innerHTML='<b>Terima kasih atas refleksinya!</b><br>'+
+      (rate>=3?'Keren, semangat belajarmu terjaga. ':('Catatan: perbanyak latihan di materi: '+(ck.length?ck.join(', '):'semua materi hari ini')+'. '))+
+      (tx?'Menarik juga pendapatmu: "'+tx.replace(/</g,'&lt;')+'"':'')+'<br><span class="muted small">Refleksi ini tersimpan hanya di perangkatmu (tidak dikirim ke mana pun).</span>';
+  });
+};
+/* ================= KONTEN MATERI 1-5 + TANTANGAN ================= */
+var M={};
+
+/* ---------- MATERI 1: PENJUMLAHAN ---------- */
+M.m1={num:1,title:'Penjumlahan Dua Matriks',ac:'#2D7DD2',
+body:`
+<p class="lead">Operasi pertama kita: <b>penjumlahan</b>. Bayangkan kamu menggabungkan data penjualan dua cabang toko, atau menggabungkan skor dua ronde pertandingan &mdash; dua tabel seukuran digabung jadi satu. Persis itulah penjumlahan matriks.</p>
+<div class="card concept"><h3>Definisi &amp; SYARAT Penjumlahan</h3>
+<p>Matriks A dan B dapat dijumlahkan <b>(A + B terdefinisi)</b> hanya jika:<br>
+<b>Syarat: ordo A = ordo B</b> (banyak baris dan banyak kolomnya sama).</p>
+<p>Jika terdefinisi, hasilnya matriks baru berordo sama yang elemennya adalah <b>jumlah elemen-elemen seletak</b>:</p>
+<p style="text-align:center">A + B = [ a<sub>ij</sub> + b<sub>ij</sub> ]</p>
+<p style="text-align:center">${mx([[3,5],[2,-1]],{big:1})} + ${mx([[4,-2],[0,6]],{big:1})} = ${mx([[7,3],[2,5]],{big:1})}</p>
+<p class="muted" style="text-align:center">3+4=7, 5+(&minus;2)=3, 2+0=2, (&minus;1)+6=5 &mdash; semua dijumlah SELETAK.</p>
+</div>
+<div class="grid2">
+<div class="card"><h3>Sifat Komutatif</h3>
+<p><b>A + B = B + A</b>. Urutan boleh dibalik karena penjumlahan bilangan biasa pun komutatif: 3+4 = 4+3. Contoh: ${mx([[1,2]])} + ${mx([[3,0]])} = ${mx([[4,2]])} = ${mx([[3,0]])} + ${mx([[1,2]])}.</p></div>
+<div class="card"><h3>Sifat Asosiatif</h3>
+<p><b>(A + B) + C = A + (B + C)</b>. Bila menjumlahkan tiga matriks, mulai dari mana saja hasilnya sama &mdash; asalkan ketiganya seordo.</p></div>
+</div>
+<div class="grid2">
+<div class="card"><h3>Matriks Nol (O)</h3>
+<p><b>A + O = A</b>. Matriks nol berperan seperti "angka 0" pada bilangan: menjumlahkannya tidak mengubah apa pun. Setiap ordo punya matriks nolnya sendiri.</p></div>
+<div class="card"><h3>Lawan Jumlah</h3>
+<p><b>A + (&minus;A) = O</b>. Matriks &minus;A (lawan jumlah A) adalah A yang semua elemennya dilawan tandanya.</p></div>
+</div>
+<div class="widget" data-w="jumlah"></div>
+<div class="note awas"><b>Awas jebakan!</b> Jika ordonya berbeda &mdash; misalnya ${mx([[1,2],[3,4]])} + ${mx([[1,2,3],[4,5,6]])} &mdash; penjumlahan <u>tidak terdefinisi</u>. Tidak ada aturan menjumlahkan elemen yang tidak punya pasangan seletak!</div>`,
+contoh:[
+ {id:'c1a',q:'<b>Contoh 1.</b> Diketahui A = '+mx([[3,5],[2,-1]])+' dan B = '+mx([[4,-2],[0,6]])+'. Tentukan A + B!',steps:['Cek syarat: ordo A = 2&times;2 dan ordo B = 2&times;2. Sama &rarr; A + B terdefinisi.','Jumlahkan elemen seletak: baris 1 &rarr; 3+4 = 7 dan 5+(&minus;2) = 3.','Lanjut baris 2 &rarr; 2+0 = 2 dan (&minus;1)+6 = 5.','Tuliskan hasilnya sebagai matriks baru berordo 2&times;2.'],ans:'A + B = '+mx([[7,3],[2,5]],{big:1})+' &nbsp;(ordo 2&times;2, sama seperti kedua matriksnya).'},
+ {id:'c1b',q:'<b>Contoh 2 (kesamaan matriks).</b> Diketahui '+mx([['x',1],[4,'y']])+' + '+mx([[3,2],['y',5]])+' = '+mx([[9,3],[10,11]])+'. Tentukan nilai x dan y!',steps:['Cek syarat: kedua matriks ruas kiri berordo 2&times;2 &rarr; boleh dijumlahkan seletak. Hasilnya: '+mx([['x+3',3],['4+y','y+5']])+'.','Gunakan kesamaan matriks (elemen seletak sama): x+3 = 9 &rarr; x = 6.','Dari elemen baris 2: 4+y = 10 &rarr; y = 6.','Cek elemen yang tersisa: y+5 = 11 &rarr; 6+5 = 11 &check; (konsisten!).'],ans:'<b>x = 6</b> dan <b>y = 6</b>.'}
+]};
+
+/* ---------- MATERI 2: PENGURANGAN ---------- */
+M.m2={num:2,title:'Pengurangan Dua Matriks',ac:'#D64545',
+body:`
+<p class="lead">Operasi kedua: <b>pengurangan</b>. Gunanya jelas: mencari <b>selisih</b> &mdash; stok berkurang berapa, skor ronde kedua naik berapa, atau selisih data antar bulan.</p>
+<div class="card concept"><h3>Definisi &amp; SYARAT Pengurangan</h3>
+<p><b>Syarat: ordo A = ordo B</b> &mdash; sama seperti penjumlahan. Bila terdefinisi:</p>
+<p style="text-align:center">A &minus; B = [ a<sub>ij</sub> &minus; b<sub>ij</sub> ]</p>
+<p style="text-align:center">${mx([[7,2],[-3,5]],{big:1})} &minus; ${mx([[4,6],[1,-2]],{big:1})} = ${mx([[3,-4],[-4,7]],{big:1})}</p>
+<p class="muted" style="text-align:center">7&minus;4=3, 2&minus;6=&minus;4, (&minus;3)&minus;1=&minus;4, 5&minus;(&minus;2)=7 &mdash; kurangkan SELETAK, hati-hati dengan tanda negatif!</p>
+</div>
+<div class="grid2">
+<div class="card"><h3>Urutan PENTING</h3>
+<p>Pengurangan <b>tidak komutatif</b>: <b>A &minus; B &ne; B &minus; A</b>. Yang benar: <b>B &minus; A = &minus;(A &minus; B)</b> &mdash; hasilnya persis berlawanan tanda. 5 &minus; 2 = 3 tetapi 2 &minus; 5 = &minus;3.</p></div>
+<div class="card"><h3>Cara Aman: A &minus; B = A + (&minus;B)</h3>
+<p>Ganti pengurangan dengan penjumlahan lawan: balik dulu tanda SEMUA elemen B (&minus;B), lalu jumlahkan ke A. Trik ini mencegah kesalahan tanda yang sangat sering terjadi.</p></div>
+</div>
+<div class="widget" data-w="kurang"></div>
+<div class="note awas"><b>Awas jebakan!</b> Kesalahan paling umum: mengurangkan angka yang salah posisi, dan mengabaikan kurung negatif. Ingat: 5 &minus; (&minus;2) = 5 + 2 = <b>7</b>, bukan 3!</div>`,
+contoh:[
+ {id:'c2a',q:'<b>Contoh 1.</b> Diketahui A = '+mx([[7,2],[-3,5]])+' dan B = '+mx([[4,6],[1,-2]])+'. Tentukan A &minus; B!',steps:['Cek syarat: kedua matriks berordo 2&times;2 &rarr; A &minus; B terdefinisi.','Baris 1: 7&minus;4 = 3 dan 2&minus;6 = &minus;4.','Baris 2: (&minus;3)&minus;1 = &minus;4 dan 5&minus;(&minus;2) = 5+2 = 7 (kurang bilangan negatif = menambah!).'],ans:'A &minus; B = '+mx([[3,-4],[-4,7]],{big:1})},
+ {id:'c2b',q:'<b>Contoh 2 (campuran).</b> Diketahui A = '+mx([[6,1],[0,5]])+', B = '+mx([[2,4],[3,-1]])+', C = '+mx([[1,0],[-2,3]])+'. Tentukan A &minus; B + C!',steps:['Kerjakan dari KIRI: hitung dulu A &minus; B = '+mx([[4,-3],[-3,6]])+'.','Baru hasil tadi dijumlahkan dengan C: '+mx([[4,-3],[-3,6]])+' + '+mx([[1,0],[-2,3]])+'.','Seletak: 4+1 = 5, &minus;3+0 = &minus;3, &minus;3+(&minus;2) = &minus;5, 6+3 = 9.'],ans:'A &minus; B + C = '+mx([[5,-3],[-5,9]],{big:1})}
+]};
+
+/* ---------- MATERI 3: PERKALIAN SKALAR ---------- */
+M.m3={num:3,title:'Perkalian Skalar (k × Matriks)',ac:'#E8871E',
+body:`
+<p class="lead">Operasi ketiga: <b>perkalian skalar</b>. "Skalar" hanyalah nama untuk bilangan biasa (bukan matriks) &mdash; seperti 2, &minus;5, atau 1/2. Misalnya resep kue digandakan 2&times;, atau harga diskon setengah harga (&times; 1/2).</p>
+<div class="card concept"><h3>Definisi &amp; SYARAT Perkalian Skalar</h3>
+<p><b>Syarat: selalu terdefinisi untuk matriks apa pun</b> &mdash; tidak ada syarat ordo!</p>
+<p style="text-align:center">k A = [ k &middot; a<sub>ij</sub> ]</p>
+<p style="text-align:center">2 &times; ${mx([[3,-1],[2,5]],{big:1})} = ${mx([[6,-2],[4,10]],{big:1})}</p>
+<p class="muted" style="text-align:center">SEMUA elemen dikalikan k. Ordo hasil = ordo semula (tidak berubah).</p>
+</div>
+<div class="grid2">
+<div class="card"><h3>Sifat Distributif</h3>
+<p>k(A + B) = kA + kB &nbsp;dan&nbsp; (k + m)A = kA + mA.<br>Contoh: 3A + 2A = (3+2)A = 5A &mdash; skalar sejenis boleh digabung.</p></div>
+<div class="card"><h3>k = &minus;1: Lawan Jumlah</h3>
+<p>(&minus;1)A = &minus;A, matriks dengan semua elemen dilawan tanda. Inilah "lawan jumlah" yang dipakai pada A + (&minus;A) = O.</p></div>
+</div>
+<div class="widget" data-w="skalar"></div>
+<div class="note awas"><b>Awas jebakan!</b> Skalar dikalikan ke <b>semua</b> elemen, bukan hanya diagonal atau baris pertama. Dan 2A artinya A + A &mdash; bukan "menambah 2" ke setiap elemen (itu jebakan opsi jawaban favorit!).</div>`,
+contoh:[
+ {id:'c3a',q:'<b>Contoh 1.</b> Diketahui A = '+mx([[2,-1],[4,0],[-5,3]])+'. Tentukan 3A!',steps:['Skalar k = 3 dikalikan ke setiap elemen, baris demi baris.','Baris 1: 3&middot;2 = 6, 3&middot;(&minus;1) = &minus;3. Baris 2: 3&middot;4 = 12, 3&middot;0 = 0.','Baris 3: 3&middot;(&minus;5) = &minus;15, 3&middot;3 = 9. Ordo tetap 3&times;2.'],ans:'3A = '+mx([[6,-3],[12,0],[-15,9]],{big:1})},
+ {id:'c3b',q:'<b>Contoh 2 (campuran).</b> Diketahui A = '+mx([[2,1],[0,4]])+' dan B = '+mx([[3,-2],[1,2]])+'. Tentukan 3A &minus; 2B!',steps:['Hitung dulu 3A = '+mx([[6,3],[0,12]])+'.','Hitung 2B = '+mx([[6,-4],[2,4]])+'.','Kurangkan seletak: 6&minus;6 = 0, 3&minus;(&minus;4) = 7, 0&minus;2 = &minus;2, 12&minus;4 = 8.'],ans:'3A &minus; 2B = '+mx([[0,7],[-2,8]],{big:1})}
+]};
+
+/* ---------- MATERI 4: PEMBAGIAN ---------- */
+M.m4={num:4,title:'Pembagian Matriks',ac:'#2A9D8F',
+body:`
+<p class="lead">Operasi keempat: <b>pembagian</b>. Di sini ada kabar penting: pembagian matriks hanya berlaku <b>terhadap skalar</b>, dan sebenarnya hanyalah perkalian dengan kebalikan skalar itu.</p>
+<div class="card concept"><h3>Definisi &amp; SYARAT Pembagian</h3>
+<p>Untuk skalar k:</p>
+<p style="text-align:center">A : k = <span class="frac"><span>1</span><span>k</span></span> A &nbsp;&nbsp; dengan syarat <b>k &ne; 0</b></p>
+<p>Membagi dengan 2 = mengalikan dengan 1/2; membagi dengan 5 = mengalikan dengan 1/5. Hasilnya boleh pecahan bila tidak habis dibagi.</p>
+<p style="text-align:center">${mx([[10,-6],[8,4]],{big:1})} : 2 = <span class="frac"><span>1</span><span>2</span></span> ${mx([[10,-6],[8,4]],{big:1})} = ${mx([[5,-3],[4,2]],{big:1})}</p>
+</div>
+<div class="grid2">
+<div class="card"><h3>k = 0: Terlarang!</h3>
+<p>A : 0 <b>tidak terdefinisi</b> &mdash; sama seperti bilangan biasa yang tidak boleh dibagi nol. Syarat k &ne; 0 wajib selalu dicek.</p></div>
+<div class="card"><h3>A : B (matriks dibagi matriks)?</h3>
+<p><b>Tidak ada</b> di tingkat kita. Penggantinya adalah perkalian dengan <b>invers matriks</b> A &middot; B<sup>&minus;1</sup> &mdash; materi bab lanjutan setelah ini!</p></div>
+</div>
+<div class="widget" data-w="bagi"></div>
+<div class="note tahu"><b>Hubungan dengan operasi lain:</b> A : k = (1/k)A, jadi semua sifat perkalian skalar ikut berlaku. Contoh campuran: (A + B) : 2 = (1/2)A + (1/2)B &mdash; sering dipakai mencari "rata-rata dua matriks".</div>`,
+contoh:[
+ {id:'c4a',q:'<b>Contoh 1.</b> Diketahui A = '+mx([[9,12],[6,3]])+'. Tentukan A : 3!',steps:['Ubah bentuknya: A : 3 = (1/3)A.','Bagi setiap elemen dengan 3: 9:3 = 3, 12:3 = 4, 6:3 = 2, 3:3 = 1.','Semua habis dibagi &mdash; hasilnya bulat semua.'],ans:'A : 3 = '+mx([[3,4],[2,1]],{big:1})},
+ {id:'c4b',q:'<b>Contoh 2 (campuran).</b> Diketahui A = '+mx([[7,3],[5,1]])+' dan B = '+mx([[1,5],[1,-3]])+'. Tentukan (A &minus; B) : 2!',steps:['Kerjakan dalam kurung dulu: A &minus; B = '+mx([[6,-2],[4,4]])+'.','Bagi hasilnya dengan 2: 6:2 = 3, (&minus;2):2 = &minus;1, 4:2 = 2, 4:2 = 2.','Urutan pengerjaan: kurung dulu, baru dibagi.'],ans:'(A &minus; B) : 2 = '+mx([[3,-1],[2,2]],{big:1})}
+]};
+
+/* ---------- MATERI 5: PERKALIAN DUA MATRIKS ---------- */
+M.m5={num:5,title:'Perkalian Dua Matriks',ac:'#7C5CBF',
+body:`
+<p class="lead">Level tertinggi hari ini: <b>mengalikan matriks dengan matriks</b>. Ini operasi paling sering dipakai di dunia nyata (grafis game, AI, ekonomi) &mdash; sekaligus paling sering salah. Kuncinya satu frasa: <b>baris &times; kolom</b>.</p>
+<div class="card concept"><h3>SYARAT Perkalian A &times; B</h3>
+<p>A &times; B hanya terdefinisi jika: <b>banyak KOLOM A = banyak BARIS B</b>.</p>
+<p style="text-align:center"><span class="tag">A berordo m &times; n</span> <b>&times;</b> <span class="tag">B berordo n &times; p</span> <b>=</b> <span class="tag">hasil m &times; p</span></p>
+<p>"Angka tengah harus kembar, angka tepat jadi ordo hasil." Contoh: A 2&times;<b>3</b> &times; B <b>3</b>&times;2 &rarr; hasil 2&times;2.</p>
+<p style="text-align:center">${mx([[2,0,1],[3,1,-1]],{big:1})} &times; ${mx([[1,2],[0,1],[4,3]],{big:1})} = ${mx([[6,7],[-1,4]],{big:1})}</p>
+</div>
+<div class="card concept"><h3>CARA: Baris di-dot-kan dengan Kolom</h3>
+<ol class="steps">
+<li>Ambil <b>baris ke-i</b> dari A dan <b>kolom ke-j</b> dari B.</li>
+<li>Kalikan pasangan seletak lalu <b>jumlahkan semuanya</b> (hasilnya satu angka).</li>
+<li>Angka itu menjadi elemen <b>c<sub>ij</sub></b> pada matriks hasil.</li>
+<li>Ulangi untuk semua kombinasi baris &times; kolom.</li>
+</ol>
+<p class="muted">Contoh satu sel: c<sub>21</sub> = (3&middot;1) + (1&middot;0) + ((&minus;1)&middot;4) = 3 + 0 + (&minus;4) = &minus;1.</p></div>
+<div class="widget" data-w="mulmat"></div>
+<div class="note awas"><b>Awas jebakan terbesar!</b> Perkalian matriks BUKAN dikali seletak. ${mx([[2,3]])} &times; ${mx([[5,1]])} &ne; ${mx([[10,3]])}. Yang benar: baris (2,3) di-dot-kan dengan kolom (5), (1) &rarr; hanya terdefinisi jika baris dikali kolom yang pas (1&times;2 &times; 2&times;1).</div>`,
+contoh:[
+ {id:'c5a',q:'<b>Contoh 1.</b> Diketahui A = '+mx([[2,3],[1,4]])+' dan B = '+mx([[5,1],[2,6]])+'. Tentukan A &times; B!',steps:['Cek syarat: A 2&times;2, B 2&times;2 &rarr; kolom A (2) = baris B (2) &rarr; terdefinisi, hasil 2&times;2.','c<sub>11</sub>: baris 1 A (2,3) &middot; kolom 1 B (5,2) = 2&middot;5 + 3&middot;2 = 10+6 = 16.','c<sub>12</sub>: (2,3) &middot; kolom 2 B (1,6) = 2&middot;1 + 3&middot;6 = 2+18 = 20.','c<sub>21</sub>: (1,4) &middot; (5,2) = 5+8 = 13. c<sub>22</sub>: (1,4) &middot; (1,6) = 1+24 = 25.'],ans:'A &times; B = '+mx([[16,20],[13,25]],{big:1})},
+ {id:'c5b',q:'<b>Contoh 2.</b> Diketahui P = '+mx([[1,2,3],[4,5,6]])+' (2&times;3) dan Q = '+mx([[7,8],[9,10],[11,12]])+' (3&times;2). Tentukan P &times; Q!',steps:['Syarat: kolom P = 3 = baris Q &rarr; terdefinisi; ordo hasil = 2&times;2.','c<sub>11</sub>: (1,2,3) &middot; (7,9,11) = 7+18+33 = 58.','c<sub>12</sub>: (1,2,3) &middot; (8,10,12) = 8+20+36 = 64.','c<sub>21</sub>: (4,5,6) &middot; (7,9,11) = 28+45+66 = 139. c<sub>22</sub>: (4,5,6) &middot; (8,10,12) = 32+50+72 = 154.'],ans:'P &times; Q = '+mx([[58,64],[139,154]],{big:1})}
+]};
+M.m5b={num:5,title:'Perkalian Dua Matriks: Sifat &amp; Kesalahan Umum',ac:'#7C5CBF',
+body:`
+<p class="lead">Sebelum berlatih, kuasai empat sifat penting perkalian matriks &mdash; terutama sifat pertama yang paling sering menjebak di ulangan.</p>
+<div class="grid2">
+<div class="card"><h3>TIDAK Komutatif!</h3>
+<p><b>A &times; B &ne; B &times; A</b> secara umum. Contoh: C = ${mx([[1,2],[3,4]])}, D = ${mx([[0,1],[1,0]])}:<br>
+C&times;D = ${mx([[2,1],[4,3]])} tetapi D&times;C = ${mx([[3,4],[1,2]])}. Berbeda!</p></div>
+<div class="card"><h3>Asosiatif</h3>
+<p>(A&times;B)&times;C = A&times;(B&times;C). Bila mengalikan tiga matriks berurutan, pengelompokannya bebas &mdash; tetapi URUTANNYA tidak boleh ditukar.</p></div>
+<div class="card"><h3>Distributif</h3>
+<p>A&times;(B + C) = A&times;B + A&times;C dan (B + C)&times;A = B&times;A + C&times;A. Perhatikan: karena tidak komutatif, urutan mengalikan dari kiri atau kanan harus dijaga.</p></div>
+<div class="card"><h3>Matriks Identitas (I)</h3>
+<p>I = ${mx([[1,0],[0,1]])}. <b>A&times;I = I&times;A = A</b> &mdash; I berperan seperti "angka 1" pada bilangan, dan di sinilah A&times;I = I&times;A berlaku.</p></div>
+</div>
+<div class="note awas"><b>Daftar kesalahan umum</b> &mdash; cek dirimu sebelum latihan:<br>
+1) Mengalikan seletak (bukan baris&middot;kolom). 2) Lupa cek syarat kolom A = baris B. 3) Salah menulis ordo hasil (yang benar: baris A &times; kolom B). 4) Menganggap A&times;B = B&times;A. 5) Lupa menjumlahkan hasil perkalian (baris&middot;kolom menghasilkan SATU angka, bukan dua).</div>`,
+contoh:[]};
+
+/* ---------- TANTANGAN: OPERASI CAMPURAN ---------- */
+M.tx={num:'\u2605',title:'Tantangan Operasi Campuran',ac:'#B23A48',
+body:'',
+contoh:[
+ {id:'tc1',q:'<b>Tantangan 1.</b> Diketahui A = '+mx([[4,-1],[2,3]])+', B = '+mx([[1,2],[-2,0]])+', C = '+mx([[5,0],[1,-4]])+'. Tentukan 2A &minus; 3B + C!',steps:['Hitung semua perkalian skalar dulu: 2A = '+mx([[8,-2],[4,6]])+' dan 3B = '+mx([[3,6],[-6,0]])+'.','Kerjakan dari kiri: 2A &minus; 3B = '+mx([[8,-2],[4,6]])+' &minus; '+mx([[3,6],[-6,0]])+' = '+mx([[5,-8],[10,6]])+'.','Terakhir tambahkan C: '+mx([[5,-8],[10,6]])+' + '+mx([[5,0],[1,-4]])+' = '+mx([[10,-8],[11,2]])+'.'],ans:'2A &minus; 3B + C = '+mx([[10,-8],[11,2]],{big:1})},
+ {id:'tc2',q:'<b>Tantangan 2 (kesamaan + skalar).</b> Diketahui A = '+mx([['2x',3],['y-1',5]])+' dan 2A = '+mx([[12,6],[8,10]])+'. Tentukan nilai x dan y!',steps:['Tulis 2A dengan mengalikan setiap elemen A: 2A = '+mx([['4x',6],['2y-2',10]])+'.','Samakan dengan elemen seletak dari '+mx([[12,6],[8,10]])+': 4x = 12 &rarr; x = 3.','2y &minus; 2 = 8 &rarr; 2y = 10 &rarr; y = 5.','Cek elemen lain: 6 = 6 &check; dan 10 = 10 &check; (konsisten).'],ans:'<b>x = 3</b> dan <b>y = 5</b>.'}
+]};
+/* BANK SOAL: MATERI 1-3 (15 soal per materi) */
+/* Data final — dihasilkan oleh scripts/shuffle_ops.js (kunci PG disebar seimbang a/b/c/d). */
+/* Sumber berhitung & versi asli: *.orig.js — validasi: scripts/check_ops.js */
+QUIZ.lat1=[{"t":"mc","q":"Matriks A dan B hanya dapat dijumlahkan (A + B terdefinisi) jika...","o":["Ordo A sama dengan ordo B","Semua elemennya positif","Keduanya matriks persegi","Ordo A lebih besar dari ordo B"],"a":0,"p":"Syarat penjumlahan matriks: <b>ordo keduanya harus sama</b>. Jika seordo, setiap elemen punya pasangan seletak untuk dijumlahkan. Jika tidak seordo, penjumlahan tidak terdefinisi."},{"t":"mc","q":"Diketahui A = <span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">3</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">5</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">2</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">-1</span></span><span class=\"mtx-r\"></span></span> dan B = <span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">4</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">-2</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">0</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">6</span></span><span class=\"mtx-r\"></span></span>. Hasil dari A + B adalah...","o":["<span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">-1</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">7</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">2</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">-7</span></span><span class=\"mtx-r\"></span></span>","<span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">7</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">3</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">8</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">-1</span></span><span class=\"mtx-r\"></span></span>","<span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">11</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">1</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">2</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">11</span></span><span class=\"mtx-r\"></span></span>","<span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">7</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">3</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">2</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">5</span></span><span class=\"mtx-r\"></span></span>"],"a":3,"p":"Jumlahkan seletak: 3+4=7, 5+(&minus;2)=3, 2+0=2, (&minus;1)+6=5 &rarr; <span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">7</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">3</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">2</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">5</span></span><span class=\"mtx-r\"></span></span>. Opsi A adalah hasil <i>pengurangan</i> A&minus;B; opsi B salah memasangkan elemen; opsi C adalah A+2B."},{"t":"mc","q":"Jika P = <span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(3,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">1</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">-4</span><span class=\"mc\" data-i=\"0\" data-j=\"2\">2</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">5</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">0</span><span class=\"mc\" data-i=\"1\" data-j=\"2\">-3</span></span><span class=\"mtx-r\"></span></span> dan Q = <span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(3,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">2</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">1</span><span class=\"mc\" data-i=\"0\" data-j=\"2\">0</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">-1</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">3</span><span class=\"mc\" data-i=\"1\" data-j=\"2\">4</span></span><span class=\"mtx-r\"></span></span>, maka P + Q = ...","o":["<span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(3,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">-1</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">-5</span><span class=\"mc\" data-i=\"0\" data-j=\"2\">2</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">6</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">-3</span><span class=\"mc\" data-i=\"1\" data-j=\"2\">-7</span></span><span class=\"mtx-r\"></span></span>","<span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(3,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">3</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">-3</span><span class=\"mc\" data-i=\"0\" data-j=\"2\">2</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">4</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">3</span><span class=\"mc\" data-i=\"1\" data-j=\"2\">1</span></span><span class=\"mtx-r\"></span></span>","<span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(3,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">3</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">-5</span><span class=\"mc\" data-i=\"0\" data-j=\"2\">2</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">4</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">3</span><span class=\"mc\" data-i=\"1\" data-j=\"2\">1</span></span><span class=\"mtx-r\"></span></span>","<span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(3,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">3</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">-3</span><span class=\"mc\" data-i=\"0\" data-j=\"2\">2</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">4</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">3</span><span class=\"mc\" data-i=\"1\" data-j=\"2\">-1</span></span><span class=\"mtx-r\"></span></span>"],"a":1,"p":"Seletak: 1+2=3, (&minus;4)+1=&minus;3, 2+0=2; 5+(&minus;1)=4, 0+3=3, (&minus;3)+4=1 &rarr; <span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(3,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">3</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">-3</span><span class=\"mc\" data-i=\"0\" data-j=\"2\">2</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">4</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">3</span><span class=\"mc\" data-i=\"1\" data-j=\"2\">1</span></span><span class=\"mtx-r\"></span></span>. Cek ulang opsi lain: &minus;4+1 itu &minus;3 (bukan &minus;5), dan (&minus;3)+4 itu 1 (bukan &minus;1)."},{"t":"in","q":"Diketahui R = <span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">6</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">-2</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">1</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">1</span><span class=\"mc\" data-i=\"2\" data-j=\"0\">3</span><span class=\"mc\" data-i=\"2\" data-j=\"1\">0</span></span><span class=\"mtx-r\"></span></span> dan S = <span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">-1</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">5</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">2</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">-4</span><span class=\"mc\" data-i=\"2\" data-j=\"0\">0</span><span class=\"mc\" data-i=\"2\" data-j=\"1\">7</span></span><span class=\"mtx-r\"></span></span>. Berapakah elemen baris ke-1 kolom ke-1 dari R + S?","a":"5","p":"R+S terdefinisi (keduanya 3&times;2). Elemen (1,1) = 6 + (&minus;1) = <b>5</b>."},{"t":"mc","q":"Hasil dari <span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(1,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">7</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">-3</span></span><span class=\"mtx-r\"></span></span> + <span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(1,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">2</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">4</span></span><span class=\"mtx-r\"></span></span> adalah...","o":["<span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(1,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">9</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">1</span></span><span class=\"mtx-r\"></span></span>","<span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(1,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">9</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">7</span></span><span class=\"mtx-r\"></span></span>","<span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(1,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">5</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">-7</span></span><span class=\"mtx-r\"></span></span>","<span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(1,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">14</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">-6</span></span><span class=\"mtx-r\"></span></span>"],"a":0,"p":"Seordo 2&times;1, jumlahkan seletak: 7+2 = 9 dan (&minus;3)+4 = 1. Opsi D adalah 2&times;T (perkalian skalar), bukan penjumlahan."},{"t":"in","q":"Diketahui A = <span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">8</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">-1</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">0</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">4</span></span><span class=\"mtx-r\"></span></span> dan B = <span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">2</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">6</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">-5</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">3</span></span><span class=\"mtx-r\"></span></span>. Berapakah elemen baris ke-2 kolom ke-1 dari A + B?","a":"-5","p":"A+B terdefinisi. Elemen (2,1) = 0 + (&minus;5) = <b>&minus;5</b>. Hati-hati: 0 + (&minus;5) tetap &minus;5, bukan 5."},{"t":"mc","q":"Jika <span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">x</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">1</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">4</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">y</span></span><span class=\"mtx-r\"></span></span> + <span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">3</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">2</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">y</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">5</span></span><span class=\"mtx-r\"></span></span> = <span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">9</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">3</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">10</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">11</span></span><span class=\"mtx-r\"></span></span>, maka nilai x adalah...","o":["9","3","6","7"],"a":2,"p":"Jumlahkan seletak lalu pakai kesamaan matriks: x+3 = 9 &rarr; <b>x = 6</b>. (Cek: 4+y = 10 &rarr; y = 6, dan y+5 = 11 &rarr; 6+5 = 11 &check; konsisten.)"},{"t":"in","q":"Jika <span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">2</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">a</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">b</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">-1</span></span><span class=\"mtx-r\"></span></span> + <span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">3</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">-1</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">5</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">2</span></span><span class=\"mtx-r\"></span></span> = <span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">5</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">4</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">9</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">1</span></span><span class=\"mtx-r\"></span></span>, berapakah nilai a + b?","a":"9","p":"Seletak: 2+3=5 &check;; a+(&minus;1)=4 &rarr; a=5; b+5=9 &rarr; b=4; (&minus;1)+2=1 &check;. Jadi a+b = 5+4 = <b>9</b>."},{"t":"mc","q":"Sifat A + B = B + A pada operasi penjumlahan matriks disebut...","o":["Asosiatif","Komutatif","Distributif","Identitas"],"a":1,"p":"Itu sifat <b>komutatif</b> (pertukaran). Asosiatif menyangkut pengelompokan tiga matriks, distributif menghubungkan kali dan jumlah, identitas menyangkut matriks nol."},{"t":"mc","q":"Diketahui A = <span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">1</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">2</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">3</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">4</span></span><span class=\"mtx-r\"></span></span>, B = <span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">5</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">0</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">-1</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">2</span></span><span class=\"mtx-r\"></span></span>, dan C = <span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">2</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">2</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">2</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">2</span></span><span class=\"mtx-r\"></span></span>. Hasil dari A + B + C adalah...","o":["<span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">4</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">0</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">0</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">4</span></span><span class=\"mtx-r\"></span></span>","<span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">8</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">4</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">4</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">8</span></span><span class=\"mtx-r\"></span></span>","<span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">6</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">2</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">2</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">6</span></span><span class=\"mtx-r\"></span></span>","<span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">8</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">4</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">6</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">8</span></span><span class=\"mtx-r\"></span></span>"],"a":1,"p":"A+B = <span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">6</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">2</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">2</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">6</span></span><span class=\"mtx-r\"></span></span> lalu tambah C seletak: 6+2=8, 2+2=4, 2+2=4, 6+2=8 &rarr; <span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">8</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">4</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">4</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">8</span></span><span class=\"mtx-r\"></span></span>. Opsi A justru A+B&minus;C, opsi C belum menambahkan C."},{"t":"mc","q":"Jika A + K = A untuk setiap matriks A (yang seordo dengan K), maka K adalah...","o":["Matriks identitas","Matriks skalar","Transpose dari A","Matriks nol"],"a":3,"p":"Hanya <b>matriks nol O</b> (semua elemen 0) yang membuat A+O = A. Matriks identitas berperan untuk PERKALIAN, bukan penjumlahan."},{"t":"in","q":"Penjualan cabang A: <span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">12</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">8</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">5</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">9</span></span><span class=\"mtx-r\"></span></span> dan cabang B: <span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">10</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">7</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">6</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">8</span></span><span class=\"mtx-r\"></span></span> (baris = jenis produk, kolom = minggu ke-1 dan ke-2). Berapa total penjualan produk pertama pada minggu pertama kedua cabang digabung?","a":"22","p":"Total = A + B (seordo, boleh dijumlah). Elemen (1,1) = 12 + 10 = <b>22</b>."},{"t":"mc","q":"Jika <span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">x+y</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">3</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">2</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">x-y</span></span><span class=\"mtx-r\"></span></span> + <span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">1</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">0</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">0</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">1</span></span><span class=\"mtx-r\"></span></span> = <span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">7</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">3</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">2</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">5</span></span><span class=\"mtx-r\"></span></span>, maka nilai x adalah...","o":["5","6","7","1"],"a":0,"p":"Jumlahkan seletak: x+y+1 = 7 sehingga x+y = 6, dan x&minus;y+1 = 5 sehingga x&minus;y = 4. Jumlahkan kedua persamaan: 2x = 6+4 = 10 &rarr; <b>x = 5</b> (dan y = 1)."},{"t":"in","q":"Diketahui A = <span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">4</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">-3</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">2</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">1</span></span><span class=\"mtx-r\"></span></span> dan A + B = <span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">7</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">0</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">5</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">-2</span></span><span class=\"mtx-r\"></span></span>. Berapakah elemen b<sub>21</sub> (baris ke-2 kolom ke-1 matriks B)?","a":"3","p":"Dari A + B = C diperoleh B = C &minus; A. Elemen (2,1): 5 &minus; 2 = <b>3</b>. Penjumlahan bisa \"dibalik\" menjadi pengurangan."},{"t":"mc","q":"Berikut ini penjumlahan matriks yang TIDAK dapat dilakukan adalah...","o":["<span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">1</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">2</span></span><span class=\"mtx-r\"></span></span> + <span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">3</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">4</span></span><span class=\"mtx-r\"></span></span>","<span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(1,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">5</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">1</span></span><span class=\"mtx-r\"></span></span> + <span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(1,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">0</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">2</span></span><span class=\"mtx-r\"></span></span>","<span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">1</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">2</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">3</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">4</span></span><span class=\"mtx-r\"></span></span> + <span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(3,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">1</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">2</span><span class=\"mc\" data-i=\"0\" data-j=\"2\">3</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">4</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">5</span><span class=\"mc\" data-i=\"1\" data-j=\"2\">6</span></span><span class=\"mtx-r\"></span></span>","<span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(1,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">2</span></span><span class=\"mtx-r\"></span></span> + <span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(1,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">3</span></span><span class=\"mtx-r\"></span></span>"],"a":2,"p":"Opsi C: ordo 2&times;2 dengan 2&times;3 &mdash; tidak seordo &rarr; TIDAK terdefinisi. Tiga opsi lainnya seordo sehingga boleh dijumlahkan."}];
+QUIZ.lat2=[{"t":"mc","q":"Pengurangan matriks A &minus; B hanya dapat dilakukan jika...","o":["Semua elemen B lebih kecil dari elemen A","A dan B sama-sama matriks persegi","B adalah transpose dari A","Ordo A = ordo B"],"a":3,"p":"Sama seperti penjumlahan: syaratnya <b>ordo sama</b>, lalu elemennya dikurangkan seletak."},{"t":"mc","q":"Diketahui A = <span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">7</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">2</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">-3</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">5</span></span><span class=\"mtx-r\"></span></span> dan B = <span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">4</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">6</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">1</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">-2</span></span><span class=\"mtx-r\"></span></span>. Hasil dari A &minus; B adalah...","o":["<span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">11</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">8</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">-2</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">3</span></span><span class=\"mtx-r\"></span></span>","<span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">3</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">-4</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">-4</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">7</span></span><span class=\"mtx-r\"></span></span>","<span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">-3</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">4</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">4</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">-7</span></span><span class=\"mtx-r\"></span></span>","<span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">3</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">-4</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">-2</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">7</span></span><span class=\"mtx-r\"></span></span>"],"a":1,"p":"Seletak: 7&minus;4=3, 2&minus;6=&minus;4, (&minus;3)&minus;1=&minus;4, 5&minus;(&minus;2)=5+2=7 &rarr; <span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">3</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">-4</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">-4</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">7</span></span><span class=\"mtx-r\"></span></span>. Opsi A adalah hasil penjumlahan; opsi C urutannya terbalik (B&minus;A); opsi D salah pada (&minus;3)&minus;1."},{"t":"mc","q":"Dari dua matriks yang sama (A = <span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">7</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">2</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">-3</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">5</span></span><span class=\"mtx-r\"></span></span>, B = <span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">4</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">6</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">1</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">-2</span></span><span class=\"mtx-r\"></span></span>), hasil dari B &minus; A adalah...","o":["<span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">3</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">-4</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">-4</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">7</span></span><span class=\"mtx-r\"></span></span>","<span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">-3</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">4</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">4</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">-7</span></span><span class=\"mtx-r\"></span></span>","<span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">3</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">4</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">4</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">-7</span></span><span class=\"mtx-r\"></span></span>","<span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">-3</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">4</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">-4</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">7</span></span><span class=\"mtx-r\"></span></span>"],"a":1,"p":"B&minus;A = &minus;(A&minus;B) = <span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">-3</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">4</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">4</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">-7</span></span><span class=\"mtx-r\"></span></span> &mdash; persis berlawanan tanda dengan A&minus;B = <span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">3</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">-4</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">-4</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">7</span></span><span class=\"mtx-r\"></span></span>. Urutan pengurangan TIDAK boleh dibalik!"},{"t":"in","q":"Diketahui P = <span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(3,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">5</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">-1</span><span class=\"mc\" data-i=\"0\" data-j=\"2\">3</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">2</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">0</span><span class=\"mc\" data-i=\"1\" data-j=\"2\">4</span></span><span class=\"mtx-r\"></span></span> dan Q = <span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(3,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">3</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">2</span><span class=\"mc\" data-i=\"0\" data-j=\"2\">-1</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">0</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">5</span><span class=\"mc\" data-i=\"1\" data-j=\"2\">6</span></span><span class=\"mtx-r\"></span></span>. Berapakah elemen baris ke-2 kolom ke-3 dari P &minus; Q?","a":"-2","p":"P&minus;Q terdefinisi (ordo 2&times;3 sama). Elemen (2,3) = 4 &minus; 6 = <b>&minus;2</b>."},{"t":"mc","q":"Hasil dari <span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">9</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">4</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">-1</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">8</span></span><span class=\"mtx-r\"></span></span> &minus; <span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">2</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">4</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">-1</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">3</span></span><span class=\"mtx-r\"></span></span> adalah...","o":["<span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">7</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">0</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">0</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">5</span></span><span class=\"mtx-r\"></span></span>","<span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">11</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">0</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">0</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">11</span></span><span class=\"mtx-r\"></span></span>","<span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">-7</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">0</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">0</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">-5</span></span><span class=\"mtx-r\"></span></span>","<span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">7</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">0</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">-2</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">5</span></span><span class=\"mtx-r\"></span></span>"],"a":0,"p":"Seletak: 9&minus;2=7, 4&minus;4=0, (&minus;1)&minus;(&minus;1)=0, 8&minus;3=5 &rarr; <span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">7</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">0</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">0</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">5</span></span><span class=\"mtx-r\"></span></span>. Opsi B mengalikan malah menjumlah; opsi C urutan terbalik; opsi D salah menghitung &minus;1&minus;(&minus;1) yang seharusnya 0."},{"t":"in","q":"Jika <span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">5</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">x</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">3</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">y</span></span><span class=\"mtx-r\"></span></span> &minus; <span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">2</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">1</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">4</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">2</span></span><span class=\"mtx-r\"></span></span> = <span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">3</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">6</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">-1</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">0</span></span><span class=\"mtx-r\"></span></span>, berapakah nilai x?","a":"7","p":"Seletak: 5&minus;2=3 &check;; x&minus;1=6 &rarr; <b>x=7</b>; 3&minus;4=&minus;1 &check;; y&minus;2=0 &rarr; y=2. Pengurangan lalu kesamaan matriks: cocokkan posisi yang memuat variabel."},{"t":"mc","q":"Diketahui A = <span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">6</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">1</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">0</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">5</span></span><span class=\"mtx-r\"></span></span>, B = <span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">2</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">4</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">3</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">-1</span></span><span class=\"mtx-r\"></span></span>, C = <span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">1</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">0</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">-2</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">3</span></span><span class=\"mtx-r\"></span></span>. Hasil dari A &minus; B + C adalah...","o":["<span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">3</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">-3</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">-1</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">3</span></span><span class=\"mtx-r\"></span></span>","<span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">7</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">5</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">5</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">1</span></span><span class=\"mtx-r\"></span></span>","<span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">5</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">-3</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">-5</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">9</span></span><span class=\"mtx-r\"></span></span>","<span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">5</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">3</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">-5</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">9</span></span><span class=\"mtx-r\"></span></span>"],"a":2,"p":"Kerjakan dari kiri: A&minus;B = <span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">4</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">-3</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">-3</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">6</span></span><span class=\"mtx-r\"></span></span> lalu +C = <span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">5</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">-3</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">-5</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">9</span></span><span class=\"mtx-r\"></span></span>. Opsi A adalah A&minus;(B+C); opsi B adalah A+B&minus;C; opsi D salah tanda di elemen (1,2)."},{"t":"in","q":"Diketahui A = <span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">10</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">0</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">-2</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">6</span></span><span class=\"mtx-r\"></span></span> dan A &minus; B = <span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">4</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">5</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">0</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">9</span></span><span class=\"mtx-r\"></span></span>. Berapakah elemen b<sub>11</sub>?","a":"6","p":"Dari A &minus; B = D diperoleh B = A &minus; D. Elemen (1,1): 10 &minus; 4 = <b>6</b>."},{"t":"mc","q":"Gudang menyimpan <span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">45</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">30</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">20</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">15</span></span><span class=\"mtx-r\"></span></span> unit (baris = jenis barang, kolom = gudang ke-1 dan ke-2). Sebanyak <span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">12</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">18</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">9</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">10</span></span><span class=\"mtx-r\"></span></span> unit terjual. Sisa barang = ...","o":["<span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">57</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">48</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">29</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">25</span></span><span class=\"mtx-r\"></span></span>","<span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">-33</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">-12</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">-11</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">-5</span></span><span class=\"mtx-r\"></span></span>","<span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">33</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">12</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">11</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">5</span></span><span class=\"mtx-r\"></span></span>","<span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">33</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">18</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">11</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">5</span></span><span class=\"mtx-r\"></span></span>"],"a":2,"p":"Sisa = stok &minus; terjual (seletak): 45&minus;12=33, 30&minus;18=12, 20&minus;9=11, 15&minus;10=5 &rarr; <span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">33</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">12</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">11</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">5</span></span><span class=\"mtx-r\"></span></span>. Opsi D salah di 30&minus;18."},{"t":"mc","q":"Pernyataan yang BENAR tentang A &minus; B dan B &minus; A adalah...","o":["A &minus; B = B &minus; A, karena pengurangan komutatif","A &minus; B = &minus;(B &minus; A), umumnya keduanya berbeda","A &minus; B = B &minus; A hanya jika A dan B persegi","A &minus; B selalu sama dengan nol"],"a":1,"p":"Pengurangan TIDAK komutatif: A&minus;B = &minus;(B&minus;A). Keduanya sama hanya dalam kasus khusus A = B (hasilnya O) &mdash; bukan karena ordo."},{"t":"in","q":"Jika <span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">8</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">b</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">a</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">5</span></span><span class=\"mtx-r\"></span></span> &minus; <span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">3</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">2</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">1</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">7</span></span><span class=\"mtx-r\"></span></span> = <span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">5</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">1</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">6</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">-2</span></span><span class=\"mtx-r\"></span></span>, berapakah nilai a?","a":"7","p":"Seletak: 8&minus;3=5 &check;; b&minus;2=1 &rarr; b=3; a&minus;1=6 &rarr; <b>a=7</b>; 5&minus;7=&minus;2 &check;."},{"t":"mc","q":"A &minus; B dapat juga ditulis sebagai...","o":["A + B","B &minus; A","(&minus;A) + (&minus;B)","A + (&minus;B)"],"a":3,"p":"Mengurangi = menambah lawan jumlah: <b>A &minus; B = A + (&minus;B)</b>. Opsi C adalah &minus;(A+B) yang berbeda. Trik ini membantu menghindari salah tanda."},{"t":"in","q":"Skor ronde 1: <span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">15</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">20</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">10</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">25</span></span><span class=\"mtx-r\"></span></span> dan ronde 2: <span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">9</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">12</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">14</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">8</span></span><span class=\"mtx-r\"></span></span> (baris = pemain, kolom = level). Berapakah selisih skor pemain kedua pada level kedua (ronde 1 &minus; ronde 2)?","a":"17","p":"Elemen (2,2): 25 &minus; 8 = <b>17</b>."},{"t":"mc","q":"Jika <span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">2x</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">3</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">1</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">y</span></span><span class=\"mtx-r\"></span></span> &minus; <span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">1</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">1</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">1</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">2</span></span><span class=\"mtx-r\"></span></span> = <span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">7</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">2</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">0</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">4</span></span><span class=\"mtx-r\"></span></span>, maka nilai x + y adalah...","o":["8","12","10","6"],"a":2,"p":"Seletak: 2x&minus;1=7 &rarr; x=4; 3&minus;1=2 &check;; 1&minus;1=0 &check;; y&minus;2=4 &rarr; y=6. Jadi x+y = 4+6 = <b>10</b>."},{"t":"mc","q":"Berikut ini pengurangan matriks yang TIDAK terdefinisi adalah...","o":["<span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(1,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">1</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">2</span><span class=\"mc\" data-i=\"2\" data-j=\"0\">3</span></span><span class=\"mtx-r\"></span></span> &minus; <span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(1,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">4</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">5</span></span><span class=\"mtx-r\"></span></span>","<span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">1</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">2</span></span><span class=\"mtx-r\"></span></span> &minus; <span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">3</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">4</span></span><span class=\"mtx-r\"></span></span>","<span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(1,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">5</span></span><span class=\"mtx-r\"></span></span> &minus; <span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(1,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">2</span></span><span class=\"mtx-r\"></span></span>","<span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">1</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">2</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">3</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">4</span></span><span class=\"mtx-r\"></span></span> &minus; <span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">0</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">0</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">0</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">0</span></span><span class=\"mtx-r\"></span></span>"],"a":0,"p":"Opsi A: ordo 3&times;1 dengan 2&times;1 &mdash; tidak seordo &rarr; tidak terdefinisi. Semua opsi lain seordo."}];
+QUIZ.lat3=[{"t":"mc","q":"Hasil kali skalar kA diperoleh dengan cara...","o":["Mengalikan hanya elemen diagonal dengan k","Mengalikan SETIAP elemen A dengan k","Mengalikan hanya baris pertama dengan k","Menambahkan k ke setiap elemen A"],"a":1,"p":"Definisi: kA = [k&middot;a<sub>ij</sub>] &mdash; <b>semua</b> elemen dikalikan k, dan ordo hasil sama dengan ordo A. Menambah k ke tiap elemen adalah jebakan klasik!"},{"t":"mc","q":"Diketahui A = <span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">2</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">-1</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">4</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">0</span></span><span class=\"mtx-r\"></span></span>. Hasil dari 3A adalah...","o":["<span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">6</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">-3</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">12</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">0</span></span><span class=\"mtx-r\"></span></span>","<span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">5</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">2</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">7</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">3</span></span><span class=\"mtx-r\"></span></span>","<span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">6</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">-3</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">4</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">0</span></span><span class=\"mtx-r\"></span></span>","<span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">-6</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">3</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">-12</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">0</span></span><span class=\"mtx-r\"></span></span>"],"a":0,"p":"3&middot;2=6, 3&middot;(&minus;1)=&minus;3, 3&middot;4=12, 3&middot;0=0 &rarr; <span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">6</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">-3</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">12</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">0</span></span><span class=\"mtx-r\"></span></span>. Opsi B salah karena hanya \"menambah 3\"; opsi C lupa mengalikan baris kedua; opsi D tanda terbalik."},{"t":"in","q":"Diketahui B = <span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">1</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">5</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">-2</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">3</span><span class=\"mc\" data-i=\"2\" data-j=\"0\">0</span><span class=\"mc\" data-i=\"2\" data-j=\"1\">4</span></span><span class=\"mtx-r\"></span></span>. Berapakah elemen baris ke-2 kolom ke-1 dari &minus;2B?","a":"4","p":"(&minus;2)&times;(&minus;2) = <b>4</b>. Perhatikan: mengalikan dua bilangan negatif menghasilkan positif."},{"t":"mc","q":"Hasil dari &minus;2 &times; <span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">1</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">5</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">-2</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">3</span><span class=\"mc\" data-i=\"2\" data-j=\"0\">0</span><span class=\"mc\" data-i=\"2\" data-j=\"1\">4</span></span><span class=\"mtx-r\"></span></span> adalah...","o":["<span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">2</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">10</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">-4</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">6</span><span class=\"mc\" data-i=\"2\" data-j=\"0\">0</span><span class=\"mc\" data-i=\"2\" data-j=\"1\">8</span></span><span class=\"mtx-r\"></span></span>","<span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">-2</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">-10</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">4</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">-6</span><span class=\"mc\" data-i=\"2\" data-j=\"0\">0</span><span class=\"mc\" data-i=\"2\" data-j=\"1\">-8</span></span><span class=\"mtx-r\"></span></span>","<span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">-2</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">-10</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">4</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">-6</span><span class=\"mc\" data-i=\"2\" data-j=\"0\">0</span><span class=\"mc\" data-i=\"2\" data-j=\"1\">8</span></span><span class=\"mtx-r\"></span></span>","<span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">1</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">5</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">-2</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">3</span><span class=\"mc\" data-i=\"2\" data-j=\"0\">0</span><span class=\"mc\" data-i=\"2\" data-j=\"1\">4</span></span><span class=\"mtx-r\"></span></span>"],"a":1,"p":"Semua elemen dikali &minus;2: 1&rarr;&minus;2, 5&rarr;&minus;10, &minus;2&rarr;4, 3&rarr;&minus;6, 0&rarr;0, 4&rarr;&minus;8 &rarr; <span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">-2</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">-10</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">4</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">-6</span><span class=\"mc\" data-i=\"2\" data-j=\"0\">0</span><span class=\"mc\" data-i=\"2\" data-j=\"1\">-8</span></span><span class=\"mtx-r\"></span></span>. Opsi A lupa tanda negatif; opsi C salah di elemen terakhir."},{"t":"in","q":"Diketahui C = <span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">6</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">9</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">12</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">15</span></span><span class=\"mtx-r\"></span></span>. Berapakah elemen baris ke-2 kolom ke-2 dari (1/3)C?","a":"5","p":"(1/3)C = <span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">2</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">3</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">4</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">5</span></span><span class=\"mtx-r\"></span></span>. Elemen (2,2) = 15 &divide; 3 = <b>5</b>."},{"t":"mc","q":"Jika k &times; <span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">3</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">1</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">-2</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">4</span></span><span class=\"mtx-r\"></span></span> = <span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">12</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">4</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">-8</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">16</span></span><span class=\"mtx-r\"></span></span>, maka k = ...","o":["12","3","4","16"],"a":2,"p":"Bandingkan elemen seletak: 3k = 12 &rarr; <b>k = 4</b>. Cek: 4&middot;1 = 4 &check;, 4&middot;(&minus;2) = &minus;8 &check;, 4&middot;4 = 16 &check;."},{"t":"mc","q":"Diketahui P = <span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">1</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">4</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">-2</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">3</span></span><span class=\"mtx-r\"></span></span> dan Q = <span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">2</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">0</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">5</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">-1</span></span><span class=\"mtx-r\"></span></span>. Hasil dari 2P + 3Q adalah...","o":["<span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">8</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">8</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">-11</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">3</span></span><span class=\"mtx-r\"></span></span>","<span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">6</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">8</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">6</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">4</span></span><span class=\"mtx-r\"></span></span>","<span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">8</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">8</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">11</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">3</span></span><span class=\"mtx-r\"></span></span>","<span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">3</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">4</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">3</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">2</span></span><span class=\"mtx-r\"></span></span>"],"a":2,"p":"2P = <span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">2</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">8</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">-4</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">6</span></span><span class=\"mtx-r\"></span></span> dan 3Q = <span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">6</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">0</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">15</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">-3</span></span><span class=\"mtx-r\"></span></span>; jumlah seletak &rarr; <span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">8</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">8</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">11</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">3</span></span><span class=\"mtx-r\"></span></span>. Opsi B adalah 2(P+Q) &mdash; skalar 3-nya hilang; opsi D belum dikali skalar sama sekali."},{"t":"in","q":"Bentuk 4A &minus; A dapat disederhanakan menjadi kA. Berapakah nilai k?","a":"3","p":"4A &minus; A = (4&minus;1)A = <b>3</b>A &mdash; inilah sifat distributif: skalar sejenis digabung, (4&minus;1) = 3."},{"t":"mc","q":"Matriks &minus;A (lawan jumlah dari A) adalah...","o":["Matriks yang semua elemennya nol","Transpose dari A","Matriks A yang baris dan kolomnya ditukar","Hasil (&minus;1)A: semua elemen A dilawan tandanya"],"a":3,"p":"&minus;A = (&minus;1)A &mdash; setiap elemen dilawan tanda, sehingga A + (&minus;A) = O. Matriks nol adalah lawan jumlah yang memenuhi A + O = A, beda konsep."},{"t":"in","q":"Jika <span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">2x</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">4</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">-6</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">y</span></span><span class=\"mtx-r\"></span></span> = &minus;2 &times; <span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">-3</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">-2</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">3</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">-5</span></span><span class=\"mtx-r\"></span></span>, berapakah nilai x?","a":"3","p":"&minus;2 &times; <span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">-3</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">-2</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">3</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">-5</span></span><span class=\"mtx-r\"></span></span> = <span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">6</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">4</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">-6</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">10</span></span><span class=\"mtx-r\"></span></span>. Dari elemen (1,1): 2x = 6 &rarr; <b>x = 3</b>. Cek elemen lain: 4=4 &check;, &minus;6=&minus;6 &check;, y = 10."},{"t":"mc","q":"Diketahui A = <span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">1</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">3</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">-2</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">1</span></span><span class=\"mtx-r\"></span></span> dan B = <span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">4</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">-1</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">2</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">5</span></span><span class=\"mtx-r\"></span></span>. Hasil dari 2(A + B) adalah...","o":["<span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">6</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">5</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">-2</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">7</span></span><span class=\"mtx-r\"></span></span>","<span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">-6</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">8</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">-8</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">-8</span></span><span class=\"mtx-r\"></span></span>","<span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">10</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">4</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">0</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">12</span></span><span class=\"mtx-r\"></span></span>","<span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">9</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">1</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">2</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">11</span></span><span class=\"mtx-r\"></span></span>"],"a":2,"p":"A+B = <span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">5</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">2</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">0</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">6</span></span><span class=\"mtx-r\"></span></span> lalu dikali 2 &rarr; <span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">10</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">4</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">0</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">12</span></span><span class=\"mtx-r\"></span></span>. Ini sama dengan 2A+2B (distributif). Opsi A mengalikan 2 hanya ke A; opsi B malah mengurangkan."},{"t":"in","q":"Harga dua menu (dalam ribuan rupiah) tertulis pada matriks <span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">8</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">5</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">12</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">7</span></span><span class=\"mtx-r\"></span></span>. Saat harga naik 2 kali lipat, matriks harganya menjadi 2 &times; matriks semula. Berapa harga menu pertama (baris 1, kolom 1) setelah naik, dalam ribuan rupiah?","a":"16","p":"2 &times; <span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">8</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">5</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">12</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">7</span></span><span class=\"mtx-r\"></span></span> = <span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">16</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">10</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">24</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">14</span></span><span class=\"mtx-r\"></span></span>. Elemen (1,1) = 2&middot;8 = <b>16</b>."},{"t":"mc","q":"Jika A berordo 2 &times; 3, maka matriks 5A berordo...","o":["2 &times; 3 (sama dengan A)","3 &times; 2","5 &times; 5","10 &times; 15"],"a":0,"p":"Perkalian skalar <b>tidak mengubah ordo</b>. Yang mengubah ordo hanyalah perkalian dua matriks."},{"t":"in","q":"Jika 3 &times; <span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">a</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">2</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">-1</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">b</span></span><span class=\"mtx-r\"></span></span> = <span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">9</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">6</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">-3</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">12</span></span><span class=\"mtx-r\"></span></span>, berapakah nilai a + b?","a":"7","p":"Seletak: 3a = 9 &rarr; a = 3; 3&middot;2 = 6 &check;; 3&middot;(&minus;1) = &minus;3 &check;; 3b = 12 &rarr; b = 4. Maka a+b = 3+4 = <b>7</b>."},{"t":"mc","q":"Berdasarkan sifat distributif, (2 + 3)A sama dengan...","o":["2A + 3","5 + A","2A + 3B","2A + 3A"],"a":3,"p":"(k+m)A = kA + mA. Jadi (2+3)A = 2A + 3A = 5A. Skalar mengalikan matriks, bukan \"menempel\" pada penjumlahan bilangan."}];
+/* BANK SOAL: MATERI 4-5 (15 soal per materi) */
+/* Data final — dihasilkan oleh scripts/shuffle_ops.js (kunci PG disebar seimbang a/b/c/d). */
+/* Sumber berhitung & versi asli: *.orig.js — validasi: scripts/check_ops.js */
+QUIZ.lat4=[{"t":"mc","q":"Untuk skalar k (dengan k &ne; 0), operasi A : k sama dengan...","o":["k &times; A","A &minus; k","A + k","(1/k) &times; A"],"a":3,"p":"Membagi dengan k = mengalikan dengan kebalikannya: <b>A : k = (1/k)A</b>. Contoh: A : 2 = (1/2)A. Inilah alasan pembagian matriks \"sebenarnya\" adalah perkalian skalar."},{"t":"mc","q":"Pembagian matriks A : k terdefinisi selama...","o":["k &gt; 0","k &ne; 0","k bulat positif","A matriks persegi"],"a":1,"p":"Syaratnya hanya satu: <b>k &ne; 0</b>, karena tidak ada bilangan (maupun matriks) yang boleh dibagi nol. Tanda k bebas (boleh negatif) dan ordonya bebas."},{"t":"mc","q":"Diketahui A = <span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">10</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">-6</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">8</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">4</span></span><span class=\"mtx-r\"></span></span>. Hasil dari A : 2 adalah...","o":["<span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">5</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">-3</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">4</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">2</span></span><span class=\"mtx-r\"></span></span>","<span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">20</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">-12</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">16</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">8</span></span><span class=\"mtx-r\"></span></span>","<span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">10</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">-6</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">4</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">2</span></span><span class=\"mtx-r\"></span></span>","<span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">5</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">-6</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">8</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">2</span></span><span class=\"mtx-r\"></span></span>"],"a":0,"p":"A : 2 = (1/2)A: 10:2=5, (&minus;6):2=&minus;3, 8:2=4, 4:2=2 &rarr; <span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">5</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">-3</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">4</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">2</span></span><span class=\"mtx-r\"></span></span>. Opsi B justru mengalikan 2; opsi C dan D hanya membagi sebagian elemen."},{"t":"in","q":"Diketahui B = <span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">9</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">12</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">6</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">3</span></span><span class=\"mtx-r\"></span></span>. Berapakah elemen baris ke-1 kolom ke-2 dari B : 3?","a":"4","p":"B : 3 = <span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">3</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">4</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">2</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">1</span></span><span class=\"mtx-r\"></span></span>. Elemen (1,2) = 12 : 3 = <b>4</b>."},{"t":"mc","q":"Hasil dari <span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">8</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">-4</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">0</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">10</span></span><span class=\"mtx-r\"></span></span> : (&minus;2) adalah...","o":["<span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">-16</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">8</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">0</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">-20</span></span><span class=\"mtx-r\"></span></span>","<span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">4</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">-2</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">0</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">5</span></span><span class=\"mtx-r\"></span></span>","<span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">8</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">-4</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">0</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">10</span></span><span class=\"mtx-r\"></span></span>","<span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">-4</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">2</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">0</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">-5</span></span><span class=\"mtx-r\"></span></span>"],"a":3,"p":"C : (&minus;2) = (&minus;1/2)C: 8:( &minus;2) = &minus;4, (&minus;4):(&minus;2) = 2, 0, 10:(&minus;2) = &minus;5 &rarr; <span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">-4</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">2</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">0</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">-5</span></span><span class=\"mtx-r\"></span></span>. Opsi A salah karena mengalikan &minus;2 alih-alih membagi; opsi B lupa tanda."},{"t":"in","q":"Jika <span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">x</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">15</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">9</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">y</span></span><span class=\"mtx-r\"></span></span> : 3 = <span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">2</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">5</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">3</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">4</span></span><span class=\"mtx-r\"></span></span>, berapakah nilai x?","a":"6","p":"Maksudnya (1/3)matriks = <span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">2</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">5</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">3</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">4</span></span><span class=\"mtx-r\"></span></span>, jadi matriks sebelum dibagi = <span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">6</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">15</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">9</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">12</span></span><span class=\"mtx-r\"></span></span>. Dari elemen (1,1): x : 3 = 2 &rarr; <b>x = 6</b>. (Dan y : 3 = 4 &rarr; y = 12.)"},{"t":"mc","q":"Diketahui A = <span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">3</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">7</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">2</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">9</span></span><span class=\"mtx-r\"></span></span>. Hasil dari A : 5 ditulis sebagai pecahan adalah...","o":["<span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">15</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">35</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">10</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">45</span></span><span class=\"mtx-r\"></span></span>","<span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\"><span class=\"frac\"><span>3</span><span>5</span></span></span><span class=\"mc\" data-i=\"0\" data-j=\"1\"><span class=\"frac\"><span>7</span><span>5</span></span></span><span class=\"mc\" data-i=\"1\" data-j=\"0\"><span class=\"frac\"><span>2</span><span>5</span></span></span><span class=\"mc\" data-i=\"1\" data-j=\"1\"><span class=\"frac\"><span>9</span><span>5</span></span></span></span><span class=\"mtx-r\"></span></span>","<span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">8</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">12</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">7</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">14</span></span><span class=\"mtx-r\"></span></span>","<span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\"><span class=\"frac\"><span>5</span><span>3</span></span></span><span class=\"mc\" data-i=\"0\" data-j=\"1\"><span class=\"frac\"><span>5</span><span>7</span></span></span><span class=\"mc\" data-i=\"1\" data-j=\"0\"><span class=\"frac\"><span>5</span><span>2</span></span></span><span class=\"mc\" data-i=\"1\" data-j=\"1\"><span class=\"frac\"><span>5</span><span>9</span></span></span></span><span class=\"mtx-r\"></span></span>"],"a":1,"p":"A : 5 = (1/5)A &mdash; setiap elemen dikali 1/5: 3/5, 7/5, 2/5, 9/5. Opsi A mengalikan 5; opsi C menambah 5; opsi D membalik pecahannya."},{"t":"in","q":"Diketahui A = <span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">3</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">7</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">1</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">-5</span></span><span class=\"mtx-r\"></span></span> dan B = <span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">5</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">1</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">3</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">1</span></span><span class=\"mtx-r\"></span></span>. Berapakah elemen baris ke-2 kolom ke-2 dari (A + B) : 2?","a":"-2","p":"A+B = <span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">8</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">8</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">4</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">-4</span></span><span class=\"mtx-r\"></span></span> (seordo, boleh dijumlah). Lalu : 2 = <span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">4</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">4</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">2</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">-2</span></span><span class=\"mtx-r\"></span></span>. Elemen (2,2) = (&minus;4) : 2 = <b>&minus;2</b>."},{"t":"mc","q":"Pernyataan yang BENAR tentang \"pembagian antar dua matriks\" (A : B) adalah...","o":["Tidak terdefinisi di tingkat SMA; penggantinya perkalian dengan invers matriks","Dilakukan dengan membagi elemen seletak","Terdefinisi asalkan ordo sama","Sama dengan A : (ordo B)"],"a":0,"p":"Tidak ada operasi A : B dalam materi matriks dasar. Nanti di bab lanjutan, \"membagi dengan B\" dilakukan dengan mengalikan <b>invers B<sup>&minus;1</sup></b> &mdash; itu sebabnya invers disebut \"alat pembagi\" matriks."},{"t":"in","q":"Sebuah resep kue memerlukan bahan tertulis <span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">12</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">8</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">4</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">6</span></span><span class=\"mtx-r\"></span></span> (baris = bahan, kolom = tahap). Resep ingin dibuat setengah porsi. Berapa takaran bahan baris ke-2 kolom ke-1 pada setengah porsi?","a":"2","p":"Setengah porsi = matriks : 2 = <span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">6</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">4</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">2</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">3</span></span><span class=\"mtx-r\"></span></span>. Elemen (2,1) = 4 : 2 = <b>2</b>."},{"t":"mc","q":"Jika A : 5 = k &times; A, maka nilai k adalah...","o":["5","&minus;5","<span class=\"frac\"><span>1</span><span>25</span></span>","<span class=\"frac\"><span>1</span><span>5</span></span>"],"a":3,"p":"A : 5 = (1/5)A, jadi <b>k = 1/5</b>. Pembagian selalu berubah menjadi perkalian dengan kebalikan &mdash; bukan 5, dan bukan 1/25."},{"t":"in","q":"Diketahui A = <span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">5</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">1</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">3</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">7</span></span><span class=\"mtx-r\"></span></span> dan B = <span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">4</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">2</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">2</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">6</span></span><span class=\"mtx-r\"></span></span>. Berapakah elemen baris ke-1 kolom ke-2 dari (2A &minus; B) : 2?","a":"0","p":"2A = <span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">10</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">2</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">6</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">14</span></span><span class=\"mtx-r\"></span></span>, lalu 2A &minus; B = <span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">6</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">0</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">4</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">8</span></span><span class=\"mtx-r\"></span></span>, terakhir : 2 = <span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">3</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">0</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">2</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">4</span></span><span class=\"mtx-r\"></span></span>. Elemen (1,2) = 0 : 2 = <b>0</b>."},{"t":"mc","q":"Jika <span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">6</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">10</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">-2</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">8</span></span><span class=\"mtx-r\"></span></span> : 2 = <span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">3</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">k</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">-1</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">4</span></span><span class=\"mtx-r\"></span></span>, maka nilai k adalah...","o":["10","20","5","&minus;5"],"a":2,"p":"Bagi setiap elemen dengan 2: 6:2=3, 10:2=<b>5</b>, (&minus;2):2=&minus;1, 8:2=4. Jadi k = 5."},{"t":"in","q":"Jika <span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">9</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">a</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">b</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">-6</span></span><span class=\"mtx-r\"></span></span> : 3 = <span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">3</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">2</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">1</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">-2</span></span><span class=\"mtx-r\"></span></span>, berapakah nilai a + b?","a":"9","p":"Sebelum dibagi 3, matriksnya adalah <span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">9</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">6</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">3</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">-6</span></span><span class=\"mtx-r\"></span></span>. Maka a = 6 dan b = 3, sehingga a+b = <b>9</b>."},{"t":"mc","q":"Di antara operasi berikut, yang TIDAK terdefinisi adalah...","o":["Matriks A dibagi 5","Matriks A dikali 1/3","Matriks A dibagi 0","Matriks A dibagi (&minus;2)"],"a":2,"p":"A : 0 tidak pernah boleh &mdash; pembagian dengan nol tidak terdefinisi, termasuk pada matriks. Pembagian dengan skalar bukan nol selalu boleh, untuk ordo apa pun."}];
+QUIZ.lat5=[{"t":"mc","q":"Perkalian A &times; B hanya terdefinisi jika...","o":["Banyak KOLOM A = banyak BARIS B","Ordo A = ordo B","Keduanya matriks persegi","Banyak BARIS A = banyak KOLOM B"],"a":0,"p":"Syarat perkalian: <b>kolom A = baris B</b>. (Syarat pada opsi D justru untuk B &times; A.) Angka tengah harus kembar; angka tepat menjadi ordo hasil."},{"t":"mc","q":"Jika A berordo 2 &times; 3 dan B berordo 3 &times; 2, maka ordo A &times; B adalah...","o":["3 &times; 3","2 &times; 2","2 &times; 3","3 &times; 2"],"a":1,"p":"Angka tengah (3 dan 3) kembar &rarr; terdefinisi; angka tepat menjadi ordo hasil: <b>2 &times; 2</b>."},{"t":"mc","q":"Diketahui A = <span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">2</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">3</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">1</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">4</span></span><span class=\"mtx-r\"></span></span> dan B = <span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">5</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">1</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">2</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">6</span></span><span class=\"mtx-r\"></span></span>. Hasil dari A &times; B adalah...","o":["<span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">10</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">3</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">2</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">24</span></span><span class=\"mtx-r\"></span></span>","<span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">16</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">20</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">13</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">25</span></span><span class=\"mtx-r\"></span></span>","<span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">11</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">19</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">10</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">30</span></span><span class=\"mtx-r\"></span></span>","<span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">16</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">13</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">20</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">25</span></span><span class=\"mtx-r\"></span></span>"],"a":1,"p":"c<sub>11</sub> = 2&middot;5+3&middot;2 = 16; c<sub>12</sub> = 2&middot;1+3&middot;6 = 20; c<sub>21</sub> = 1&middot;5+4&middot;2 = 13; c<sub>22</sub> = 1&middot;1+4&middot;6 = 25 &rarr; <span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">16</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">20</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">13</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">25</span></span><span class=\"mtx-r\"></span></span>. Opsi A adalah perkalian SELETAK (salah!); opsi C adalah B&times;A; opsi D baris-kolomnya tertukar saat menyalin."},{"t":"in","q":"Diketahui P = <span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(3,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">1</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">2</span><span class=\"mc\" data-i=\"0\" data-j=\"2\">3</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">4</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">5</span><span class=\"mc\" data-i=\"1\" data-j=\"2\">6</span></span><span class=\"mtx-r\"></span></span> dan Q = <span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">7</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">8</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">9</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">10</span><span class=\"mc\" data-i=\"2\" data-j=\"0\">11</span><span class=\"mc\" data-i=\"2\" data-j=\"1\">12</span></span><span class=\"mtx-r\"></span></span>. Berapakah elemen baris ke-1 kolom ke-1 dari P &times; Q?","a":"58","p":"c<sub>11</sub> = baris 1 P di-dot-kan kolom 1 Q = 1&middot;7 + 2&middot;9 + 3&middot;11 = 7+18+33 = <b>58</b>."},{"t":"mc","q":"Diketahui C&times;D = <span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">2</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">1</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">4</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">3</span></span><span class=\"mtx-r\"></span></span> dan D&times;C = <span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">3</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">4</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">1</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">2</span></span><span class=\"mtx-r\"></span></span> untuk C = <span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">1</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">2</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">3</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">4</span></span><span class=\"mtx-r\"></span></span>, D = <span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">0</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">1</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">1</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">0</span></span><span class=\"mtx-r\"></span></span>. Pernyataan yang benar adalah...","o":["C&times;D = D&times;C, jadi perkalian matriks komutatif","C&times;D = D&times;C hanya jika C dan D persegi","C&times;D + D&times;C = matriks nol","C&times;D &ne; D&times;C, jadi perkalian matriks tidak komutatif"],"a":3,"p":"Hasilnya berbeda &rarr; <b>perkalian matriks TIDAK komutatif</b>. Inilah perbedaan terpenting dengan penjumlahan matriks (yang komutatif)."},{"t":"in","q":"Diketahui E = <span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">2</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">0</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">1</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">3</span></span><span class=\"mtx-r\"></span></span> dan F = <span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">1</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">4</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">2</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">5</span></span><span class=\"mtx-r\"></span></span>. Berapakah elemen baris ke-2 kolom ke-2 dari E &times; F?","a":"19","p":"c<sub>22</sub> = baris 2 E (1,3) di-dot-kan kolom 2 F (4,5) = 1&middot;4 + 3&middot;5 = 4+15 = <b>19</b>."},{"t":"mc","q":"Diketahui A = <span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">5</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">2</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">-3</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">4</span></span><span class=\"mtx-r\"></span></span> dan I = <span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">1</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">0</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">0</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">1</span></span><span class=\"mtx-r\"></span></span>. Hasil dari A &times; I adalah...","o":["<span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">1</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">0</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">0</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">1</span></span><span class=\"mtx-r\"></span></span>","<span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">5</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">0</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">0</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">4</span></span><span class=\"mtx-r\"></span></span>","<span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">5</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">2</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">-3</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">4</span></span><span class=\"mtx-r\"></span></span>","<span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">2</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">5</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">4</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">-3</span></span><span class=\"mtx-r\"></span></span>"],"a":2,"p":"A&times;I = I&times;A = A &mdash; matriks identitas seperti \"angka 1\" untuk perkalian matriks: <b><span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">5</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">2</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">-3</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">4</span></span><span class=\"mtx-r\"></span></span></b>."},{"t":"in","q":"Jika <span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">x</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">2</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">1</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">y</span></span><span class=\"mtx-r\"></span></span> &times; <span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">0</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">1</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">1</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">0</span></span><span class=\"mtx-r\"></span></span> = <span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">2</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">3</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">4</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">1</span></span><span class=\"mtx-r\"></span></span>, berapakah nilai x + y?","a":"7","p":"Hasil kali = <span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">2</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">x</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">y</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">1</span></span><span class=\"mtx-r\"></span></span> (setiap elemen bertukar posisi). Kesamaan matriks: x = 3 dan y = 4, jadi x+y = <b>7</b>."},{"t":"mc","q":"Diketahui A = <span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">1</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">2</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">0</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">1</span></span><span class=\"mtx-r\"></span></span>, B = <span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">3</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">1</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">2</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">2</span></span><span class=\"mtx-r\"></span></span>, dan C = <span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">1</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">0</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">0</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">1</span></span><span class=\"mtx-r\"></span></span>. Hasil dari A &times; B + C adalah...","o":["<span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">10</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">6</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">4</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">4</span></span><span class=\"mtx-r\"></span></span>","<span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">6</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">5</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">2</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">1</span></span><span class=\"mtx-r\"></span></span>","<span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">8</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">5</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">2</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">3</span></span><span class=\"mtx-r\"></span></span>","<span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">8</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">5</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">2</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">2</span></span><span class=\"mtx-r\"></span></span>"],"a":2,"p":"A&times;B = <span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">7</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">5</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">2</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">2</span></span><span class=\"mtx-r\"></span></span> dulu, lalu +C: <span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">8</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">5</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">2</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">3</span></span><span class=\"mtx-r\"></span></span>. Opsi A justru (A+C)&times;B; opsi B adalah A&times;B&minus;C; opsi D lupa menambahkan C."},{"t":"in","q":"Diketahui A = <span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">1</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">1</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">2</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">0</span></span><span class=\"mtx-r\"></span></span> dan B = <span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">3</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">0</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">1</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">2</span></span><span class=\"mtx-r\"></span></span>. Berapakah elemen baris ke-1 kolom ke-1 dari 2(A &times; B)?","a":"8","p":"A&times;B = <span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">4</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">2</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">6</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">0</span></span><span class=\"mtx-r\"></span></span>, lalu dikali 2: <span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">8</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">4</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">12</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">0</span></span><span class=\"mtx-r\"></span></span>. Elemen (1,1) = <b>8</b>."},{"t":"mc","q":"Perkalian matriks berikut yang TIDAK terdefinisi adalah...","o":["Matriks 1&times;3 dikali matriks 3&times;1","Matriks 2&times;2 dikali matriks 2&times;2","Matriks 3&times;1 dikali matriks 1&times;4","Matriks 2&times;3 dikali matriks 2&times;2"],"a":3,"p":"Kolom matriks pertama (3) &ne; baris matriks kedua (2) &rarr; tidak terdefinisi. Tiga lainnya memenuhi syarat kolom = baris."},{"t":"in","q":"Diketahui A = <span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">3</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">0</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">1</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">2</span></span><span class=\"mtx-r\"></span></span> dan B = <span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">2</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">4</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">0</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">5</span></span><span class=\"mtx-r\"></span></span>. Berapakah elemen baris ke-2 kolom ke-2 dari A &times; B?","a":"14","p":"c<sub>22</sub> = baris 2 A (1,2) di-dot-kan kolom 2 B (4,5) = 1&middot;4 + 2&middot;5 = 4+10 = <b>14</b>."},{"t":"in","q":"Diketahui A = <span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">2</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">a</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">0</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">3</span></span><span class=\"mtx-r\"></span></span> dan B = <span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">1</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">0</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">2</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">1</span></span><span class=\"mtx-r\"></span></span>. Jika A &times; B = <span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">4</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">1</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">6</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">3</span></span><span class=\"mtx-r\"></span></span>, berapakah nilai a?","a":"1","p":"A&times;B = <span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">4</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">1</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">6</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">3</span></span><span class=\"mtx-r\"></span></span>. Elemen (1,1): 2&middot;1 + a&middot;2 = 2+2a = 4 &rarr; 2a = 2 &rarr; <b>a = 1</b>. Cek elemen (1,2): 2&middot;0 + a&middot;1 = a = 1 &check; konsisten."},{"t":"mc","q":"Sifat (A &times; B) &times; C = A &times; (B &times; C) disebut...","o":["Asosiatif","Komutatif","Distributif","Identitas"],"a":0,"p":"Itu sifat <b>asosiatif</b> (pengelompokan bebas). Yang tidak dipunyai perkalian matriks adalah komutatif: A&times;B &ne; B&times;A secara umum."},{"t":"in","q":"Pesanan roti ditulis matriks resep R = <span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(2,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">2</span><span class=\"mc\" data-i=\"0\" data-j=\"1\">1</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">1</span><span class=\"mc\" data-i=\"1\" data-j=\"1\">3</span></span><span class=\"mtx-r\"></span></span> (baris = jenis roti, kolom = tepung dan mentega per loyang) dan pesanan p = <span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(1,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">4</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">2</span></span><span class=\"mtx-r\"></span></span> (kolom = banyak loyang tiap jenis). Berapa takaran TEPUNG total yang dibutuhkan (elemen baris ke-1 hasil R &times; p)?","a":"10","p":"R &times; p = <span class=\"mtx\"><span class=\"mtx-l\"></span><span class=\"mtx-g\" style=\"grid-template-columns:repeat(1,auto)\"><span class=\"mc\" data-i=\"0\" data-j=\"0\">10</span><span class=\"mc\" data-i=\"1\" data-j=\"0\">10</span></span><span class=\"mtx-r\"></span></span>. Baris ke-1: 2&middot;4 + 1&middot;2 = 8+2 = <b>10</b> takaran tepung. Inilah kegunaan nyata perkalian matriks!"}];
+/* ================= PERAKITAN SLIDE & MESIN APLIKASI ================= */
+var QUIZ=QUIZ||{};
+var CONTOH={};
+Object.keys(M).forEach(function(k){(M[k].contoh||[]).forEach(function(c){CONTOH[c.id]=c;});});
+
+/* ---------- pembungkus kartu contoh soal ---------- */
+function mountSteps(el,c){
+  el.innerHTML='<div class="ccard"><div class="cq">'+c.q+'</div>'+
+    c.steps.map(function(s,i){return '<div class="stepitem"><b>Langkah '+(i+1)+'.</b> '+s+'</div>';}).join('')+
+    '<div class="answerbox"><b>Jawaban:</b><br>'+c.ans+'</div>'+
+    '<div class="qbtns"><button class="btn bstep">Tampilkan Langkah 1 dari '+c.steps.length+'</button>'+
+    '<button class="btn ghost breset" style="display:none">Ulangi dari awal</button></div></div>';
+  var shown=0;
+  function wire(){
+    el.querySelector('.bstep').addEventListener('click',function(){
+      var items=el.querySelectorAll('.stepitem');
+      if(shown<items.length){items[shown].classList.add('show');shown++;}
+      if(shown>=items.length){
+        el.querySelector('.answerbox').classList.add('show');
+        this.textContent='Semua langkah tampil \u2713';this.disabled=true;
+        el.querySelector('.breset').style.display='';
+      }else{this.textContent='Tampilkan Langkah '+(shown+1)+' dari '+items.length;}
+    });
+    el.querySelector('.breset').addEventListener('click',function(){
+      shown=0;
+      el.querySelectorAll('.stepitem').forEach(function(s){s.classList.remove('show');});
+      el.querySelector('.answerbox').classList.remove('show');
+      var b=el.querySelector('.bstep');b.disabled=false;b.textContent='Tampilkan Langkah 1 dari '+c.steps.length;
+      this.style.display='none';
+    });
+  }
+  wire();
+}
+
+/* ---------- mesin kuis ---------- */
+function mountQuiz(el,qid,qs){
+  var title=el.dataset.title||'Latihan';
+  var h='<div class="quizhead"><b>'+title+'</b><span class="qscore" id="qs-'+qid+'">Dijawab 0/'+qs.length+' \u00b7 Benar 0</span></div>';
+  h+=qs.map(function(q,i){
+    var inner='<div class="qtop"><span class="qnum">Soal '+(i+1)+'</span><span class="qtype">'+(q.t==='mc'?'Pilihan Ganda':'Isian Singkat')+'</span><span class="qbadge"></span></div>'+
+      '<div class="qtext">'+q.q+'</div>';
+    if(q.t==='mc'){
+      inner+='<div class="opts">'+q.o.map(function(op,oi){
+        return '<button class="opt" data-oi="'+oi+'"><span class="ol">'+String.fromCharCode(65+oi)+'.</span><span>'+op+'</span></button>';
+      }).join('')+'</div>';
+    }else{
+      inner+='<input class="qinput" placeholder="Ketik jawabanmu di sini..." autocomplete="off">';
+    }
+    inner+='<div class="qbtns"><button class="btn bcheck">Cek Jawaban</button><button class="btn ghost bsol">Lihat Pembahasan</button></div>'+
+      '<div class="feed"></div><div class="sol"><b>Pembahasan:</b> '+q.p+'</div>';
+    return '<div class="qcard" data-qi="'+i+'">'+inner+'</div>';
+  }).join('');
+  el.innerHTML=h;
+
+  if(!S.score[qid])S.score[qid]={ans:0,ok:0};
+  function updScore(){
+    var sc=S.score[qid];
+    el.querySelector('#qs-'+qid).textContent='Dijawab '+sc.ans+'/'+qs.length+' \u00b7 Benar '+sc.ok;
+  }
+
+  el.addEventListener('click',function(e){
+    var opt=e.target.closest('.opt');
+    if(opt&&!opt.disabled){
+      var card=opt.closest('.qcard');
+      if(card.dataset.done)return;
+      card.querySelectorAll('.opt').forEach(function(x){x.classList.remove('sel');});
+      opt.classList.add('sel');
+      return;
+    }
+    var chk=e.target.closest('.bcheck');
+    if(chk){doCheck(chk.closest('.qcard'));return;}
+    var sol=e.target.closest('.bsol');
+    if(sol){
+      var s=sol.closest('.qcard').querySelector('.sol');
+      s.classList.toggle('show');
+      sol.textContent=s.classList.contains('show')?'Sembunyikan Pembahasan':'Lihat Pembahasan';
+    }
+  });
+  el.addEventListener('keydown',function(e){
+    if(e.key==='Enter'&&e.target.classList.contains('qinput')){
+      doCheck(e.target.closest('.qcard'));
+    }
+  });
+
+  function doCheck(card){
+    if(card.dataset.done)return;
+    var qi=+card.dataset.qi,q=qs[qi];
+    var feed=card.querySelector('.feed'),badge=card.querySelector('.qbadge');
+    if(q.t==='mc'){
+      var sel=card.querySelector('.opt.sel');
+      if(!sel){
+        feed.className='feed show badd';feed.textContent='Pilih salah satu jawaban dulu, ya!';
+        card.classList.add('shake');setTimeout(function(){card.classList.remove('shake');},350);
+        return;
+      }
+      var oi=+sel.dataset.oi,benar=(oi===q.a);
+      card.dataset.done='1';
+      card.querySelectorAll('.opt').forEach(function(x){x.disabled=true;});
+      card.querySelector('.opt[data-oi="'+q.a+'"]').classList.add('right');
+      if(!benar)sel.classList.add('wrong');
+      badge.textContent=benar?'\u2713 Benar':'\u2717 Salah';badge.className='qbadge '+(benar?'ok':'bad');
+      feed.className='feed show '+(benar?'good':'badd');
+      feed.innerHTML=benar?'Tepat sekali! Jawabanmu benar.':'Belum tepat. Jawaban yang benar: <b>'+String.fromCharCode(65+q.a)+'</b>.';
+      S.score[qid].ans++;if(benar)S.score[qid].ok++;
+    }else{
+      var inp=card.querySelector('.qinput'),v=inp.value;
+      if(!v.trim()){
+        feed.className='feed show badd';feed.textContent='Ketik dulu jawabanmu, ya!';
+        card.classList.add('shake');setTimeout(function(){card.classList.remove('shake');},350);
+        return;
+      }
+      var acc=q.alt?[q.a].concat(q.alt):[q.a];
+      var benar=checkInput(v,acc);
+      card.dataset.done='1';
+      inp.disabled=true;
+      badge.textContent=benar?'\u2713 Benar':'\u2717 Salah';badge.className='qbadge '+(benar?'ok':'bad');
+      feed.className='feed show '+(benar?'good':'badd');
+      feed.innerHTML=benar?'Tepat sekali! Jawabanmu benar.':'Belum tepat. Jawaban yang benar: <b>'+q.a+'</b>.';
+      S.score[qid].ans++;if(benar)S.score[qid].ok++;
+    }
+    card.querySelector('.bcheck').disabled=true;
+    card.querySelector('.bsol').style.display='none';
+    card.querySelector('.sol').classList.add('show');
+    updScore();
+  }
+}
+
+/* ---------- slide: cover ---------- */
+function coverHTML(){
+  var chips=['Penjumlahan','Pengurangan','Perkalian Skalar','Pembagian Matriks','Perkalian Dua Matriks'];
+  return '<div class="cover">'+
+    '<div class="sub">Matematika \u00b7 Fase F \u00b7 Kelas XI \u00b7 Kurikulum Merdeka</div>'+
+    '<h1>OPERASI MATRIKS</h1>'+
+    '<p class="desc">Menjumlah, mengurang, menggandakan, membagi, dan mengalikan matriks &mdash; lengkap dengan <b>syarat</b>, contoh berlangkah, dan <b>75 soal latihan</b>.</p>'+
+    '<div class="covermtx" style="display:flex;gap:12px;justify-content:center;align-items:center;flex-wrap:wrap">'+
+      mx([[1,2],[3,4]],{big:1})+
+      '<span style="font-size:30px;font-weight:800">+</span>'+
+      mx([[5,6],[7,8]],{big:1})+
+      '<span style="font-size:30px;font-weight:800">=</span>'+
+      mx([[6,8],[10,12]],{big:1})+
+    '</div>'+
+    '<div class="topicgrid">'+chips.map(function(c,i){return '<div class="tchip"><b>'+(i+1)+'</b>'+c+'</div>';}).join('')+'</div>'+
+    '<p class="muted small" style="margin-top:20px">Klik <b>Berikutnya \u2192</b> atau tekan tombol panah keyboard untuk mulai. Menu \u2630 di kiri atas untuk lompat ke bab mana pun.</p>'+
+  '</div>';
+}
+
+/* ---------- slide: peta operasi & syarat ---------- */
+function petaHTML(){
+  var s=[
+    ['#2D7DD2','1. Penjumlahan (A + B)','Syarat: <b>ordo A = ordo B</b>. Hasil: elemen seletak dijumlahkan. Sifat: komutatif &amp; asosiatif.'],
+    ['#D64545','2. Pengurangan (A &minus; B)','Syarat: <b>ordo A = ordo B</b>. Hasil: elemen seletak dikurangkan. <b>Urutan penting</b>: A&minus;B = &minus;(B&minus;A).'],
+    ['#E8871E','3. Perkalian Skalar (kA)','Syarat: <b>tidak ada</b> &mdash; selalu terdefinisi. Semua elemen dikali k; ordo tidak berubah.'],
+    ['#2A9D8F','4. Pembagian (A : k)','Syarat: <b>k &ne; 0</b>. A : k = (1/k)A. Antar matriks (A : B) tidak terdefinisi di tingkat kita.'],
+    ['#7C5CBF','5. Perkalian Dua Matriks (A &times; B)','Syarat: <b>kolom A = baris B</b>. Hasil: baris A di-dot-kan dengan kolom B; ordo hasil = baris A &times; kolom B.']
+  ];
+  return '<p class="lead">Hari ini kita menjalankan <b>lima operasi hitung</b> pada matriks. Setiap operasi punya aturan main yang berbeda &mdash; terutama <b>syarat terdefinisinya</b>. Peta ringkasnya seperti ini; kita bedah satu per satu di materi berikutnya.</p>'+
+    '<div class="summary">'+s.map(function(x){return '<div class="scard" style="--sc:'+x[0]+'"><b>'+x[1]+'</b><p>'+x[2]+'</p></div>';}).join('')+'</div>'+
+    '<div class="note tahu"><b>Aturan main yang berlaku untuk semua operasi</b><br>Hasil operasi matriks selalu berupa <b>matriks baru</b>. Untuk operasi campuran, kerjakan <b>perkalian (skalar &amp; matriks) lebih dulu</b>, baru penjumlahan/pengurangan dari <b>kiri ke kanan</b> &mdash; persis seperti aturan hitung campuran bilangan.</div>';
+}
+
+/* ---------- slide: bekal kesamaan matriks ---------- */
+function kesamaanHTML(){
+  return '<p class="lead">Latihan hari ini banyak memakai satu alat penting: <b>kesamaan matriks</b>. Ini "bekal" yang kamu pelajari di pertemuan sebelumnya &mdash; mari kita segarkan ingatan, karena untuk mencari nilai variabel (x, y, k) di soal-soal nanti, alat inilah kuncinya.</p>'+
+    '<div class="card concept"><h3>Syarat Kesamaan Dua Matriks</h3>'+
+    '<p>A = B jika dan hanya jika:<br>'+
+    '<b>1)</b> ordo A = ordo B, <b>dan</b> <b>2)</b> setiap pasangan elemen <b>seletak</b> bernilai sama.</p>'+
+    '<p style="text-align:center">'+mx([['x+3',6]])+' = '+mx([[9,6]])+' &nbsp;&rArr;&nbsp; x+3 = 9 &rArr; x = 6</p>'+
+    '<p class="muted">Dua syarat harus terpenuhi BERSAMAAN. Ordo berbeda? Langsung tidak sama, apa pun isinya.</p></div>'+
+    '<div class="widget" data-w="kesamaan"></div>'+
+    '<div class="note tahu"><b>Cara pakai di latihan</b><br>Setelah operasi dikerjakan, <b>cocokkan elemen seletak</b> yang memuat variabel &rarr; jadilah persamaan biasa (misal 2x = 6) &rarr; selesaikan. Kalau ada dua variabel, biasanya butuh dua persamaan dari dua posisi berbeda.</div>';
+}
+
+/* ---------- slide: tantangan operasi campuran ---------- */
+function tantanganHTML(){
+  return '<p class="lead">Semua operasi sudah kamu kuasai satu per satu. Sekarang gabungkan! <b>Operasi campuran</b> adalah soal yang memuat beberapa operasi sekaligus &mdash; model soal favorit ulangan. Ingat urutan pengerjaannya:</p>'+
+    '<div class="card concept"><h3>Urutan Pengerjaan Operasi Campuran</h3>'+
+    '<ol class="steps">'+
+    '<li><b>Kurung</b> dikerjakan paling dulu.</li>'+
+    '<li><b>Perkalian</b> (skalar &amp; perkalian matriks) dikerjakan sebelum penjumlahan/pengurangan.</li>'+
+    '<li><b>Pembagian skalar</b> setara dengan perkalian skalar (1/k).</li>'+
+    '<li>Penjumlahan &amp; pengurangan dikerjakan <b>dari kiri ke kanan</b>.</li>'+
+    '</ol></div>'+
+    '<div class="note awas"><b>Hati-hati:</b> pada perkalian matriks, urutan faktor tidak boleh ditukar (A&times;B &ne; B&times;A), dan skalar tidak boleh "melompat" melewati perkalian dua matriks: 2(AB) &ne; (2A)(2B) &mdash; yang benar 2(AB) = (2A)B = A(2B).</div>'+
+    '<p class="lead">Coba dua tantangan berlangkah ini sebelum masuk ke kesimpulan:</p>'+
+    '<div data-steps="tc1"></div>'+
+    '<div data-steps="tc2"></div>';
+}
+
+/* ---------- pabrik slide materi/contoh/latihan ---------- */
+function mSlide(m,extra){
+  return {ac:m.ac,kicker:'Materi '+m.num+(extra?' \u00b7 Lanjutan':''),title:m.title,html:m.body,grp:'Materi '+m.num};
+}
+function cSlide(m,contohIds,sub){
+  return {ac:m.ac,kicker:'Materi '+m.num+(sub?' \u00b7 Lanjutan':''),title:'Contoh Soal &amp; Pembahasan',
+    html:'<p class="lead">Amati dulu cara berpikirnya, baru latihan. Tekan tombol <b>Tampilkan Langkah</b> untuk memunculkan penyelesaian satu per satu &mdash; coba tebak dulu langkah berikutnya sebelum menekan!</p>'+
+      contohIds.map(function(id){return '<div data-steps="'+id+'"></div>';}).join(''),
+    grp:'Materi '+m.num};
+}
+function lSlide(m,qid,topic){
+  return {ac:m.ac,kicker:'Materi '+m.num,title:'Latihan 15 Soal: Uji Pemahamanmu',
+    html:'<p class="lead">Lima belas soal menantimu: campuran <b>pilihan ganda</b> dan <b>isian singkat</b>, dari soal dasar sampai <b>operasi campuran</b> dan <b>kesamaan matriks</b>. Pilih/ketik jawaban lalu tekan <b>Cek Jawaban</b>; penjelasan lengkap muncul lewat <b>Lihat Pembahasan</b>. Skormu tercatat di bilah biru.</p>'+
+      '<div data-quiz="'+qid+'" data-title="Latihan Materi '+m.num+' &mdash; '+topic+'"></div>',
+    grp:'Materi '+m.num};
+}
+
+/* ---------- SLIDES ---------- */
+var SLIDES=[
+  {ac:'#1E3A5F',html:coverHTML(),grp:'Pengantar',plain:1},
+  {ac:'#1E3A5F',kicker:'Pengantar',title:'Peta 5 Operasi &amp; Syaratnya',html:petaHTML(),grp:'Pengantar'},
+  {ac:'#1E3A5F',kicker:'Pengantar \u00b7 Bekal',title:'Bekal: Kesamaan Matriks',html:kesamaanHTML(),grp:'Pengantar'},
+  mSlide(M.m1), cSlide(M.m1,['c1a','c1b']), lSlide(M.m1,'lat1','Penjumlahan'),
+  mSlide(M.m2), cSlide(M.m2,['c2a','c2b']), lSlide(M.m2,'lat2','Pengurangan'),
+  mSlide(M.m3), cSlide(M.m3,['c3a','c3b']), lSlide(M.m3,'lat3','Perkalian Skalar'),
+  mSlide(M.m4), cSlide(M.m4,['c4a','c4b']), lSlide(M.m4,'lat4','Pembagian'),
+  mSlide(M.m5), mSlide(M.m5b,1), cSlide(M.m5,['c5a','c5b'],1), lSlide(M.m5,'lat5','Perkalian Dua Matriks'),
+  {ac:'#B23A48',kicker:'Level Boss',title:'Tantangan: Operasi Campuran',html:tantanganHTML(),grp:'Tantangan'},
+  {ac:'#1E3A5F',kicker:'Penutup',title:'Kesimpulan',html:kesimpulanHTML(),grp:'Penutup'},
+  {ac:'#2A9D8F',kicker:'Penutup',title:'Refleksi Diri',html:refleksiHTML(),grp:'Penutup'},
+  {ac:'#1E3A5F',kicker:'Penutup \u00b7 Sampai Jumpa',html:penutupHTML(),grp:'Penutup'}
+];
+
+function kesimpulanHTML(){
+  var s=[
+    ['#1E3A5F','Bekal: Kesamaan Matriks','A = B hanya jika ordo sama DAN semua elemen seletak sama. Pintu mencari nilai variabel pada soal operasi.'],
+    ['#2D7DD2','1. Penjumlahan','Syarat ordo sama; jumlahkan seletak. Komutatif, asosiatif, A+O = A, A+(&minus;A) = O.'],
+    ['#D64545','2. Pengurangan','Syarat ordo sama; kurangkan seletak. TIDAK komutatif: A&minus;B = &minus;(B&minus;A). Trik aman: A&minus;B = A+(&minus;B).'],
+    ['#E8871E','3. Perkalian Skalar','Tanpa syarat ordo; semua elemen &times; k; ordo tetap. Distributif: k(A+B) = kA+kB, (k+m)A = kA+mA.'],
+    ['#2A9D8F','4. Pembagian','A : k = (1/k)A dengan k &ne; 0; hasil boleh pecahan. Tidak ada pembagian antar matriks &mdash; nanti pakai invers.'],
+    ['#7C5CBF','5. Perkalian Dua Matriks','Syarat kolom A = baris B; hasil baris A &middot; kolom B; ordo hasil = baris A &times; kolom B. TIDAK komutatif; asosiatif &amp; distributif; A&times;I = A.'],
+    ['#B23A48','Operasi Campuran','Kurung &rarr; perkalian/pembagian dulu &rarr; jumlah/kurang dari kiri ke kanan. Kesalahan favorit: menukar urutan &amp; lupa syarat.']
+  ];
+  return '<p class="lead">Lima operasi sudah kamu lewahi, ditutup tantangan campuran. Ini peta ringkasnya &mdash; gunakan untuk belajar ulang cepat sebelum ulangan.</p>'+
+    '<div class="summary">'+s.map(function(x){return '<div class="scard" style="--sc:'+x[0]+'"><b>'+x[1]+'</b><p>'+x[2]+'</p></div>';}).join('')+'</div>'+
+    '<div class="note sukses" style="margin-top:16px"><b>Satu kalimat penutup</b><br>Seluruh operasi matriks hanyalah dua kata: <b>seletak</b> (untuk +, &minus;, skalar, dan : k) dan <b>baris&times;kolom</b> (untuk perkalian dua matriks). Hafalkan syaratnya, hitungnya perlahan, dan cek ulang tandanya.</div>';
+}
+function refleksiHTML(){
+  return '<p class="lead">Sebelum pulang, luangkan 2 menit untuk jujur pada diri sendiri: sejauh mana pemahamanmu tentang lima operasi hari ini, dan apa yang masih perlu diulang? Refleksi yang jujur = langkah cepat menuju paham.</p>'+
+    '<div class="widget" data-w="refleksi"></div>';
+}
+function penutupHTML(){
+  return '<div class="thanks">'+
+    '<div class="emojis">&#127881;&#128218;&#10024;</div>'+
+    '<h2>Thank You for Today!</h2>'+
+    '<p class="lead" style="margin:0 auto 8px">Terima kasih sudah berjuang menjalankan <b>5 operasi hitung matriks</b> hari ini &mdash; dari penjumlahan yang ramah sampai perkalian dua matriks yang penuh jebakan, plus tantangan operasi campuran. Kalian sudah menjawab <b>75 soal latihan</b>! Sekarang pondasi aljabar matriks kalian utuh.</p>'+
+    '</div>'+
+    '<div class="card concept" style="border-left-color:#5E60CE"><h3 style="color:#5E60CE">What&rsquo;s Next? &mdash; Determinan &amp; Invers Matriks</h3>'+
+    '<p>Ingat materi pembagian tadi? <b>"A : B tidak terdefinisi"</b> &mdash; karena alat yang benar untuk "membagi matriks" adalah <b>invers</b> (ditulis B<sup>&minus;1</sup>). Pertemuan berikutnya kita pelajari determinan (angka khas matriks persegi) dan cara mencari inversnya. Cukup satu pratinjau: untuk A = '+mx([[4,7],[2,6]])+', determinannya adalah 4&middot;6 &minus; 7&middot;2 = 10. Invers A<sup>&minus;1</sup> adalah matriks yang membuat A&middot;A<sup>&minus;1</sup> = I. Menarik, kan?</p>'+
+    '<p class="muted small">Mengapa penting? Invers matriks adalah "kunci" menyelesaikan sistem persamaan linear, menyandikan pesan pada kriptografi, hingga menghitung transformasi 3D pada game.</p></div>'+
+    '<div class="note tahu"><b>Sebelum pertemuan berikutnya</b><br>1) Ulangi soal latihan yang masih salah hari ini &mdash; terutama yang salah tandanya. 2) Hafalkan tiga syarat emas: <b>seordo</b> (+&nbsp;&amp;&nbsp;&minus;), <b>k &ne; 0</b> (:), <b>kolom = baris</b> (&times;). 3) Bawa semangat: determinan dan invers hanyalah perkalian &amp; pengurangan bilangan yang diatur rapi.</div>';
+}
+
+/* ---------- navigasi & menu ---------- */
+var stage=document.getElementById('stage'),idx=0;
+var S={score:{}};
+
+function go(i){
+  idx=Math.max(0,Math.min(SLIDES.length-1,i));
+  var s=SLIDES[idx];
+  var h='<section class="slide" style="--ac:'+s.ac+'">';
+  if(s.kicker)h+='<span class="kicker">'+s.kicker+'</span>';
+  if(s.title)h+='<h2 class="stitle">'+s.title+'</h2>';
+  h+=s.html+'</section>';
+  stage.innerHTML=h;
+  window.scrollTo(0,0);
+  stage.querySelectorAll('[data-w]').forEach(function(el){var f=WIDGETS[el.dataset.w];if(f)f(el);});
+  stage.querySelectorAll('[data-quiz]').forEach(function(el){mountQuiz(el,el.dataset.quiz,QUIZ[el.dataset.quiz]);});
+  stage.querySelectorAll('[data-steps]').forEach(function(el){mountSteps(el,CONTOH[el.dataset.steps]);});
+  document.getElementById('pfill').style.width=((idx+1)/SLIDES.length*100)+'%';
+  document.getElementById('counter').textContent=(idx+1)+' / '+SLIDES.length;
+  document.getElementById('prevBtn').disabled=(idx===0);
+  document.getElementById('nextBtn').disabled=(idx===SLIDES.length-1);
+  updateMenu();
+}
+
+function stripTags(s){var d=document.createElement('div');d.innerHTML=s;return d.textContent;}
+function buildMenu(){
+  var ml=document.getElementById('menulist'),lastG=null,h='';
+  SLIDES.forEach(function(s,i){
+    if(s.grp!==lastG){h+='<div class="mgroup">'+s.grp+'</div>';lastG=s.grp;}
+    h+='<button class="mitem" data-go="'+i+'"><span class="mnum">'+(i+1)+'</span><span>'+(s.title?stripTags(s.title):(s.plain?'Cover':'Slide '+(i+1)))+'</span></button>';
+  });
+  ml.innerHTML=h;
+  ml.querySelectorAll('[data-go]').forEach(function(b){
+    b.addEventListener('click',function(){closeMenu();go(+b.dataset.go);});
+  });
+}
+function updateMenu(){
+  document.querySelectorAll('.mitem').forEach(function(b){
+    b.classList.toggle('active',+b.dataset.go===idx);
+  });
+}
+function openMenu(){document.getElementById('menu').classList.add('open');document.getElementById('scrim').classList.add('show');}
+function closeMenu(){document.getElementById('menu').classList.remove('open');document.getElementById('scrim').classList.remove('show');}
+
+document.getElementById('menuBtn').addEventListener('click',openMenu);
+document.getElementById('menuClose').addEventListener('click',closeMenu);
+document.getElementById('scrim').addEventListener('click',closeMenu);
+document.getElementById('prevBtn').addEventListener('click',function(){go(idx-1);});
+document.getElementById('nextBtn').addEventListener('click',function(){go(idx+1);});
+document.addEventListener('keydown',function(e){
+  var t=e.target.tagName;
+  if(t==='INPUT'||t==='TEXTAREA')return;
+  if(e.key==='ArrowRight')go(idx+1);
+  if(e.key==='ArrowLeft')go(idx-1);
+  if(e.key==='Escape')closeMenu();
+});
+
+buildMenu();
+go(0);
+</script>
+</body>
+</html>
